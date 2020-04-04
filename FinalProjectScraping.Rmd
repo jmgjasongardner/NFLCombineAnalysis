@@ -1,0 +1,90 @@
+---
+title: "STAT 411 Final Project Scraping"
+author: "Jason Gardner"
+date: "March 30, 2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+library(XML)
+library(RCurl)
+library(stringr)
+library(tidyr)
+library(plyr)
+library(dplyr)
+
+combine <- read.csv('Group Project Data.csv')
+#three_names = combine[str_count(combine$Name, " ") >= 2, ]
+#three_names$Name
+#combine = combine[!str_count(combine$Name, " ") >= 2, ]
+#combine = separate(combine, Name, c('First','Last'), ' ')
+#combine$url = paste0('/', substr(combine$Last, 1, 1), '/', substr(combine$Last, 1, 4), substr(combine$First[1], 1, 2), toString(0), toString(0), '.htm')
+```
+
+```{r}
+pb_df <- data.frame(matrix(ncol = 2, nrow = 1))
+ap_df <- data.frame(matrix(ncol = 2, nrow = 1))
+colnames(pb_df) <- c('Pos', 'Player')
+colnames(ap_df) <- c('Pos', 'Player')
+
+for (year in 1987:2019){
+    #u <- paste0("https://www.pro-football-reference.com/players/", combine$url[i])
+    u <- paste0("https://www.pro-football-reference.com/years/", year, "/probowl.htm")
+    y <- paste0("https://www.pro-football-reference.com/years/", year, "/allpro.htm")
+    download.file(u, destfile = paste0("probowlers.html"))
+    download.file(y, destfile = paste0("allpros.html"))
+    pb <- htmlParse("probowlers.html")
+    ap <- htmlParse("allpros.html")    
+    pb_tab <- readHTMLTable(pb)
+    pb_tab <- pb_tab[[1]]
+    pb_tab <- pb_tab[,1:2]
+    ap_tab <- readHTMLTable(ap)
+    ap_tab <- ap_tab[[1]]
+    ap_tab <- ap_tab[,1:2]
+    pb_tab$Pos = as.character(pb_tab$Pos)
+    pb_tab$Player = as.character(pb_tab$Player)
+    ap_tab$Pos = as.character(ap_tab$Pos)
+    ap_tab$Player = as.character(ap_tab$Player)
+    pb_df = rbind(pb_df, pb_tab)
+    ap_df = rbind(ap_df, ap_tab)
+    free(doc)
+}
+pb_df = pb_df[2:nrow(pb_df),]
+ap_df = ap_df[2:nrow(ap_df),]
+for (i in 1:nrow(pb_df)){
+  pb_df$Player[i]=str_remove(pb_df$Player[i], '%')
+  pb_df$Player[i]=str_remove(pb_df$Player[i], "[+]")
+}
+for (i in 1:nrow(ap_df)){
+  ap_df$Player[i]=str_remove(ap_df$Player[i], '%')
+  ap_df$Player[i]=str_remove(ap_df$Player[i], "[+]")
+}
+```
+
+```{r}
+pb_df <- pb_df %>%
+  count(vars=c('Pos', 'Player')) %>%
+  rename(replace = c('freq' = 'ProBowls')) %>%
+  rename(replace = c('Player' = 'Name'))
+combine = left_join(combine, pb_df, by='Name')
+
+ap_df <- ap_df %>%
+  count(vars=c('Pos', 'Player')) %>%
+  rename(replace = c('freq' = 'AllPros')) %>%
+  rename(replace = c('Player' = 'Name'))
+combine = left_join(combine, ap_df, by='Name')
+combine['Pos.x'] <- NULL
+combine['Pos.y'] <- NULL
+names(combine) = c('Year', 'Name', 'College', 'Position', 'Height', 'Weight', 'Wonderlic', '40YD', 'Bench', 'Vert', 'Broad', 'Shuttle', '3Cone', 'ProBowls', 'AllPros')
+```
+
+```{r}
+write.csv(combine, 'CombineData.csv')
+```
+

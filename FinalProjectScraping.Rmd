@@ -19,7 +19,7 @@ library(tidyr)
 library(plyr)
 library(dplyr)
 
-combine <- read.csv('Group Project Data.csv')
+combine <- read.csv('DataOriginal.csv')
 #three_names = combine[str_count(combine$Name, " ") >= 2, ]
 #three_names$Name
 #combine = combine[!str_count(combine$Name, " ") >= 2, ]
@@ -53,7 +53,8 @@ for (year in 1987:2019){
     ap_tab$Player = as.character(ap_tab$Player)
     pb_df = rbind(pb_df, pb_tab)
     ap_df = rbind(ap_df, ap_tab)
-    free(doc)
+    free(pb)
+    free(ap)
 }
 pb_df = pb_df[2:nrow(pb_df),]
 ap_df = ap_df[2:nrow(ap_df),]
@@ -72,19 +73,17 @@ pb_df <- pb_df %>%
   count(vars=c('Pos', 'Player')) %>%
   rename(replace = c('freq' = 'ProBowls')) %>%
   rename(replace = c('Player' = 'Name'))
-combine = left_join(combine, pb_df, by='Name')
+combine = left_join(combine, pb_df, by=c('Name','POS'='Pos'))
 
 ap_df <- ap_df %>%
   count(vars=c('Pos', 'Player')) %>%
   rename(replace = c('freq' = 'AllPros')) %>%
   rename(replace = c('Player' = 'Name'))
-combine = left_join(combine, ap_df, by='Name')
-combine['Pos.x'] <- NULL
-combine['Pos.y'] <- NULL
+combine = left_join(combine, ap_df, by=c('Name','POS'='Pos'))
 names(combine) = c('Year', 'Name', 'College', 'Position', 'Height', 'Weight', 'Wonderlic', '40YD', 'Bench', 'Vert', 'Broad', 'Shuttle', '3Cone', 'ProBowls', 'AllPros')
 ```
 
 ```{r}
-write.csv(combine, 'CombineData.csv')
+# Only uncomment below if necessary
+# write.csv(combine, 'DataUpdate1.csv', row.names = FALSE)
 ```
-

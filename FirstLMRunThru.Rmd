@@ -1,0 +1,43 @@
+---
+title: "First LM Run Thru"
+author: "Jason Gardner"
+date: "April 6, 2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+library(dplyr)
+```
+
+```{r}
+dat <- read.csv('DataUpdate1.csv')
+
+have_played <- dat %>%
+  filter(Year != 2020)
+for (i in 1:nrow(have_played)){
+  if (is.na(have_played$ProBowls[i])){
+    have_played$ProBowls[i]=0
+  }
+  if (is.na(have_played$AllPros[i])){
+    have_played$AllPros[i]=0
+  }
+}
+have_played <- have_played %>% 
+  mutate(Success = ProBowls + 2*AllPros) %>%
+  arrange(desc(Success))
+
+# Only uncomment below if necessary
+# write.csv (have_played, 'havePlayed.csv')
+```
+
+```{r}
+qbs <- filter (have_played, Position == 'QB')
+
+lm(Success ~ Wonderlic + Height + Weight, data = qbs)
+# There being so many zeros makes this hella tough
+```

@@ -28,7 +28,7 @@ for (i in 1:nrow(have_played)){
   }
 }
 have_played <- have_played %>% 
-  mutate(Success = ProBowls + 2*AllPros) %>%
+  mutate(Success = ProBowls + 2*AllPros) %>% # Can be arbitrary
   arrange(desc(Success))
 
 # Only uncomment below if necessary
@@ -36,7 +36,7 @@ have_played <- have_played %>%
 ```
 
 ```{r}
-qbs <- filter (have_played, Position == 'QB')
+qbs <- filter (have_played, Position == 'QB', Success > 0)
 
 lm(Success ~ Wonderlic + Height + Weight, data = qbs)
 # There being so many zeros makes this hella tough

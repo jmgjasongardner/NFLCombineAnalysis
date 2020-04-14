@@ -1,0 +1,161 @@
+---
+title: "Approximate Value Scrape"
+author: "Jason Gardner"
+date: "April 13, 2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+library(XML)
+library(RCurl)
+library(stringr)
+library(dplyr)
+```
+
+```{r}
+draft_picks <- read.csv("https://raw.githubusercontent.com/leesharpe/nfldata/master/data/draft_picks.csv")
+draft_picks <- draft_picks %>% 
+  filter(str_length(playerid)>2)
+draft_picks$playerid <- as.character(draft_picks$playerid)
+
+position <- as.character(unique(draft_picks$position))
+aval <- data.frame(matrix(ncol = 1)) 
+#colnames(positions) <- 'ID'
+aval <- aval %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>%
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="receiving_and_rushing"]/tfoot/tr[1]/td[30]') %>% 
+  rbind('//*[@id="rushing_and_receiving"]/tfoot/tr/td[30]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="receiving_and_rushing"]/tfoot/tr[1]/td[30]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="kicking"]/tfoot/tr[1]/td[33]') %>% 
+  rbind('//*[@id="passing"]/tfoot/tr[1]/td[30]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="receiving_and_rushing"]/tfoot/tr/td[30]') %>% 
+  rbind('//*[@id="kicking"]/tfoot/tr/td[33]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]')
+aval <- aval[-1,]
+positions <- data.frame(cbind(position, aval))
+
+gms=c()
+for (i in 1:nrow(positions)){
+  gm = substr(positions$aval[i], 1, str_length(positions$aval[i])-3)
+  gm = paste0(gm, '4]')
+  gms=c(gms,gm)
+}
+positions$gms <- gms
+
+draft_picks <- left_join(draft_picks, positions)
+draft_picks <- draft_picks[-c(192, 793, 1937, 1975, 2876, 3062, 3673, 4005, 4508),]
+#urls_df <- data.frame(matrix(ncol = 3, nrow = nrow(draft_picks)))
+```
+
+```{r}
+urls <- draft_picks$playerid
+gms <- draft_picks$gms
+aval <- draft_picks$aval
+
+#for (i in 1:nrow(draft_picks)) {
+for (i in 1:nrow(draft_picks)) {
+  # get the appopriate url address
+  u <- paste0("https://www.pro-football-reference.com/players/",substr(urls[i],1,1),"/",urls[i],".htm")
+  if (url.exists(url = u)) {
+    download.file(u, destfile = paste0("approxval.html"))
+    doc <- htmlParse("approxval.html")
+    g <- getNodeSet(doc, gms[i])
+    g <- as.numeric(xmlValue(g[[1]]))
+    av <- getNodeSet(doc, aval[i])
+    av <- tryCatch({as.numeric(xmlValue(av[[1]]))}, error = function(e) {av <- NA})
+    urls_df[i, ] <- c(urls[i], g, av)
+    # (minutes[i] <- as.numeric(xmlValue(mp[[1]])))
+    free(doc)
+    print(i)
+  }
+}
+```
+
+```{r}
+good <- subset(urls_df, (!is.na(urls_df[,2]) & !is.na(urls_df[,3])))
+names(good) <- c('playerid', 'Games', 'AverageValue')
+draft_picks <- subset(draft_picks, playerid %in% good$playerid)
+draft_picks <- left_join(draft_picks, good, by='playerid')
+draft_picks$AverageValue <- as.numeric(draft_picks$AverageValue)
+draft_picks$Games <- as.numeric(draft_picks$Games)
+draft_picks <- draft_picks %>%
+  mutate(AVPer16 = AverageValue*16 / Games) %>%
+  arrange(-AVPer16)
+write.csv(draft_picks, 'AVplayers.csv')
+```
+
+IGNORE
+```{r}
+bad <- subset(urls_df, (is.na(urls_df[,2]) & is.na(urls_df[,3]) & !is.na(urls_df[,1])))
+
+draft_picks_bad <- subset(draft_picks, playerid %in% bad$X1)
+draft_picks_bad$aval <- gsub('[[1]]', '', draft_picks_bad$aval)
+draft_picks_bad$gms <- gsub('[[1]]', '', draft_picks_bad$gms)
+draft_picks_bad$aval <- gsub('tr[[]', 'tr', draft_picks_bad$aval)
+draft_picks_bad$gms <- gsub('tr[[]', 'tr', draft_picks_bad$gms)
+```
+
+IGNORE
+```{r}
+#draft_picks_bad <- draft_picks_bad[-c(),]
+urls_df_bad <- data.frame(matrix(ncol = 3, nrow = nrow(draft_picks_bad)))
+```
+
+IGNORE
+```{r}
+urls <- draft_picks_bad$playerid
+gms <- draft_picks_bad$gms
+aval <- draft_picks_bad$aval
+
+for (i in 1:25) {
+#for (i in 1:nrow(draft_picks_bad)) {
+  # get the appopriate url address
+  u <- paste0("https://www.pro-football-reference.com/players/",substr(urls[i],1,1),"/",urls[i],".htm")
+  if (url.exists(url = u)) {
+    download.file(u, destfile = paste0("approxval.html"))
+    doc <- htmlParse("approxval.html")
+    g <- getNodeSet(doc, gms[i])
+    g <- as.numeric(xmlValue(g[[1]]))
+    av <- getNodeSet(doc, aval[i])
+    av <- tryCatch({as.numeric(xmlValue(av[[1]]))}, error = function(e) {av <- NA})
+    urls_df_bad[i, ] <- c(urls[i], g, av)
+    # (minutes[i] <- as.numeric(xmlValue(mp[[1]])))
+    free(doc)
+    print(i)
+  }
+}
+```
+
+```{r}
+bigset <- read.csv('DataUpdate1.csv')
+draft_picks
+newset <- left_join(bigset, draft_picks, by=c('Position'='position', 'Name'='full_name')) %>%
+  select(c(1:13, 17:20, 22, 26:28, 14:15)) %>%
+  arrange(-AVPer16, Year, Name)
+sum(!is.na(newset$AVPer16))
+
+write.csv(newset, 'DataUpdate2.csv')
+```
+

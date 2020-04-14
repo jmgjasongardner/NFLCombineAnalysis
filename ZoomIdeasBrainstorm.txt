@@ -1,0 +1,18 @@
+Inspiration for project
+What is a combine?
+	Stuff from other papers
+What do we want to show with data?
+	Classify types of players/profile
+		First talk about success metric with probowls and allpros and why it doesn't work
+			Bin method (90% don't have the metric)
+			Only want stuff since 2000 because game of football has changed a lot since 1985
+		R package for more advanced stuff
+			Variable selection
+			Bayesian????
+	Predict future success
+Common conceptions/myths--Stuff from other papers
+	Wonderlic
+	QB hand size
+	40 yard dash for WR and RB
+	Speed vs power
+Conclusions/insights

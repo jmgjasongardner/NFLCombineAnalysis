@@ -1,0 +1,114 @@
+---
+title: "Linear Modeling"
+author: "Jason Gardner"
+date: "April 14, 2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+library(dplyr)
+```
+
+```{r}
+curr <- read.csv('DataUpdate3.csv')
+prosp <- read.csv('Prospects2020.csv')
+dim(curr)
+dim(prosp)
+head(curr)
+head(prosp)
+curr$X <- NULL
+curr <- curr %>% 
+  select(c(9:11, 1:8, everything())) %>%
+  rename(Forty = X40.YD,
+         ThreeCone = X3Cone) %>% 
+  filter (Games >= 8) %>%
+  arrange(-AV16, Name)
+write.csv(curr, 'DataUpdate4.csv')
+
+qb <- filter(curr, Position == 'QB')
+write.csv(qb, 'QBs.csv')
+rb <- filter(curr, Position == 'RB')
+write.csv(rb, 'RBs.csv')
+wr <- filter(curr, Position == 'WR')
+write.csv(wr, 'WRs.csv')
+te <- filter(curr, Position == 'TE')
+write.csv(te, 'TEs.csv')
+ol <- filter(curr, Position == 'OL')
+write.csv(ol, 'OLs.csv')
+kick <- filter(curr, Position == 'K')
+write.csv(kick, 'Kickers.csv')
+punt <- filter(curr, Position == 'P')
+write.csv(punt, 'Punters.csv')
+dl <- filter(curr, Position == 'DL')
+write.csv(dl, 'DLs.csv')
+lb <- filter(curr, Position == 'LB')
+write.csv(lb, 'LBs.csv')
+db <- filter(curr, Position == 'DB')
+write.csv(db, 'DBs.csv')
+```
+
+```{r}
+genlm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle + ThreeCone, data = curr)
+summary(genlm)
+```
+```{r}
+qblm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle + ThreeCone, data = qb)
+summary(qblm)
+
+rblm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle + ThreeCone, data = rb)
+summary(rblm)
+
+wrlm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle + ThreeCone, data = wr)
+summary(wrlm)
+
+telm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle + ThreeCone, data = te)
+summary(telm)
+
+ollm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle + ThreeCone, data = ol)
+summary(ollm)
+
+dllm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle + ThreeCone, data = dl)
+summary(dllm)
+
+lblm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle + ThreeCone, data = lb)
+summary(lblm)
+
+dblm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle + ThreeCone, data = db)
+summary(dblm)
+```
+
+
+Many of them didn't work because of so many missing values, so take out the issue columns
+
+
+
+```{r}
+qblm <- lm(AV16 ~ Height, data = qb)
+summary(qblm)
+
+rblm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle + ThreeCone, data = rb)
+summary(rblm)
+
+wrlm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle, data = wr)
+summary(wrlm)
+
+telm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad, data = te)
+summary(telm)
+
+ollm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle + ThreeCone, data = ol)
+summary(ollm)
+
+dllm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad, data = dl)
+summary(dllm)
+
+lblm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle + ThreeCone, data = lb)
+summary(lblm)
+
+dblm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle + ThreeCone, data = db)
+summary(dblm)
+```

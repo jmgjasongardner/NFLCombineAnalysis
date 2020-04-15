@@ -1,0 +1,180 @@
+---
+title: "Bayesian"
+output: pdf_document
+---
+
+Data formatting 
+```{r echo = TRUE}
+rb <- read.csv("RBs.csv")
+
+rb.full <- rb[is.na(rb$X40.YD) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$X3Cone) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$Shuttle) == FALSE, ]
+
+prosp <- read.csv('Prospects2020.csv')
+prosp_rb <- subset(prosp, Position == "RB")
+prosp_rb_full <- prosp_rb[is.na(prosp_rb$X40.YD) == FALSE, ]
+prosp_rb_full <- prosp_rb_full[is.na(prosp_rb_full$X3Cone) == FALSE, ]
+prosp_rb_full <- prosp_rb_full[is.na(prosp_rb_full$Shuttle) == FALSE, ]
+future <- as.data.frame(cbind(prosp_rb_full$X40.YD, prosp_rb_full$X3Cone, prosp_rb_full$Shuttle))
+names(future) <- c("Forty", "Cone", 
+                   "Shuttle")
+```
+
+Initial regression with significant factors 
+```{r echo = TRUE}
+rblm2 <- lm(AV16 ~  X40.YD + X3Cone + Shuttle, 
+            data = rb.full)
+summary(rblm2)
+
+rb_bay <- as.data.frame(cbind(rb.full$AV16, rb.full$X40.YD, rb.full$X3Cone, rb.full$Shuttle))
+names(rb_bay) <- c("AV16", "Forty", "Cone", 
+                   "Shuttle")
+```
+
+
+Bayesian inference 
+```{r echo = TRUE}
+#data(rb_bay)
+#attach(rb_bay)
+#logtime = log(time)
+fit = lm(AV16 ~ Forty + Cone + Shuttle, data = rb_bay)
+summary(fit)
+
+y = rb_bay$AV16
+n = length(y)
+x = as.matrix(cbind(rep(1,n), rb_bay[,2:4]))
+
+  # Compute quantities for speed
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  # MCMC settings
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  # Sample from joint posterior
+for (t in 1:T){
+  
+  # Draw sigma2
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  
+  # Draw beta
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "40 YD Dash", xlab = expression(beta[1]))
+hist(beta[,3], main = "3 Cone Drill", xlab = expression(beta[2]))
+hist(beta[,4], main = "Shuttle", xlab = expression(beta[3]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Forty = future[,1],
+                 Cone = future[,2],
+                 Shuttle = future[,3])
+
+predict(fit, x_f00, interval = "prediction")
+
+
+x_f = as.matrix(cbind(rep(1,10),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+# Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+# Posterior mean / 95% credible interval 
+cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975))))
+```
+
+```{r echo= TRUE}
+data(birdextinct)
+attach(birdextinct)
+logtime = log(time)
+fit = lm(logtime ~ nesting + as.factor(size) + as.factor(status))
+summary(fit)
+
+y = logtime
+n = length(y)
+x = as.matrix(cbind(rep(1,n), birdextinct[,3:5]))
+
+  # Compute quantities for speed
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  # MCMC settings
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  # Sample from joint posterior
+for (t in 1:T){
+  
+  # Draw sigma2
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  
+  # Draw beta
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "Nesting", xlab = expression(beta[1]))
+hist(beta[,3], main = "Size", xlab = expression(beta[2]))
+hist(beta[,4], main = "Status", xlab = expression(beta[3]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(nesting = rep(4,4),
+                 size = c(rep(0,2),rep(1,2)),
+                 status = rep(c(0,1),2))
+
+predict(fit, x_f00, interval = "prediction")
+
+x_f = as.matrix(cbind(rep(1,4),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+# Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+# Posterior mean / 95% credible interval 
+cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975))))
+```

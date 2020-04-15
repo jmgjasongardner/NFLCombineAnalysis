@@ -1,4 +1,4 @@
-"","Draft Year","Team","Pick Round","Pick Number","PlayerID","Games Played","Total AV","AV Per 16","Name","Position","College","Height","Weight","Wonderlic","40YD","Bench","Vert","Broad","Shuttle","3Cone","Pro Bowls","All Pro"
+"","Draft Year","Team","Draft Round","Pick Number","PlayerID","Games","Avg Value","AV16","Name","Position","College","Height","Weight","Wonderlic","40 YD","Bench","Vert","Broad","Shuttle","3Cone","Pro Bowls","All Pros"
 "1",2017,"KC",1,10,"MahoPa00",31,40,20.6451612903226,"Patrick Mahomes","QB","Texas Tech",74.125,225,24,4.8,NA,30,114,4.08,6.88,2,1
 "2",2018,"IND",2,36,"LeonDa00",28,30,17.1428571428571,"Darius Leonard","LB","South Carolina State",74,234,NA,4.7,17,NA,NA,NA,NA,NA,NA
 "3",2018,"BAL",1,32,"JackLa00",31,33,17.0322580645161,"Lamar Jackson","QB","Louisville",74.25,216,NA,NA,NA,NA,NA,NA,NA,1,1

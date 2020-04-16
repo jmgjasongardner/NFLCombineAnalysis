@@ -178,3 +178,8 @@ par(mfrow=c(1,1))
 cbind(apply(ytilde, 2, mean),
       t(apply(ytilde, 2, quantile, c(0.025, 0.975))))
 ```
+
+
+```{r echo = TRUE}
+value <- read.csv("AVplayers.csv") 
+```

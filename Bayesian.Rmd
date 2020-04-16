@@ -7,16 +7,16 @@ Data formatting
 ```{r echo = TRUE}
 rb <- read.csv("RBs.csv")
 
-rb.full <- rb[is.na(rb$X40.YD) == FALSE, ]
-rb.full <- rb.full[is.na(rb.full$X3Cone) == FALSE, ]
+rb.full <- rb[is.na(rb$Forty) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$ThreeCone) == FALSE, ]
 rb.full <- rb.full[is.na(rb.full$Shuttle) == FALSE, ]
 
 prosp <- read.csv('Prospects2020.csv')
 prosp_rb <- subset(prosp, Position == "RB")
-prosp_rb_full <- prosp_rb[is.na(prosp_rb$X40.YD) == FALSE, ]
-prosp_rb_full <- prosp_rb_full[is.na(prosp_rb_full$X3Cone) == FALSE, ]
+prosp_rb_full <- prosp_rb[is.na(prosp_rb$Forty) == FALSE, ]
+prosp_rb_full <- prosp_rb_full[is.na(prosp_rb_full$ThreeCone) == FALSE, ]
 prosp_rb_full <- prosp_rb_full[is.na(prosp_rb_full$Shuttle) == FALSE, ]
-future <- as.data.frame(cbind(prosp_rb_full$X40.YD, prosp_rb_full$X3Cone, prosp_rb_full$Shuttle))
+future <- as.data.frame(cbind(prosp_rb_full$Forty, prosp_rb_full$ThreeCone, prosp_rb_full$Shuttle))
 names(future) <- c("Forty", "Cone", 
                    "Shuttle")
 ```

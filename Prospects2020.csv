@@ -1,157 +1,157 @@
-"","Season","Name","College","Position","Height","Weight","Wonderlic","40 YD","Bench","Vert","Broad","Shuttle","3Cone","Pro Bowls","All Pros"
-"1",2020,"Kelly Bryant","Missouri","QB",75,225,NA,4.69,NA,35,125,4.51,7.33,NA,NA
-"2",2020,"Joe Burrow","Louisiana State","QB",76,216,NA,NA,NA,NA,NA,NA,NA,NA,NA
-"3",2020,"Kevin Davidson","Princeton","QB",76,225,NA,5,NA,28,109,4.37,7.13,NA,NA
-"4",2020,"Jacob Eason","Washington","QB",78,227,NA,4.89,NA,27.5,110,4.75,7.5,NA,NA
-"5",2020,"Jake Fromm","Georgia","QB",74,220,NA,5.01,NA,30,111,4.51,7.27,NA,NA
-"6",2020,"Anthony Gordon","Washington State","QB",74,199,NA,NA,NA,NA,NA,NA,NA,NA,NA
-"7",2020,"Justin Herbert","Oregon","QB",78,227,NA,4.68,NA,35.5,123,4.46,7.06,NA,NA
-"8",2020,"Jalen Hurts","Oklahoma","QB",73,218,NA,4.59,NA,35,125,NA,NA,NA,NA
-"9",2020,"Brian Lewerke","Michigan State","QB",75,216,NA,4.95,NA,31,113,4.4,7.14,NA,NA
-"10",2020,"Jordan Love","Utah State","QB",76,225,NA,4.74,NA,35.5,118,4.52,7.21,NA,NA
-"11",2020,"Jake Luton","Oregon State","QB",79,229,NA,NA,NA,NA,NA,NA,NA,NA,NA
-"12",2020,"Cole McDonald","Hawaii","QB",76,220,NA,4.58,NA,36,121,4.52,7.13,NA,NA
-"13",2020,"Steven Montez","Colorado","QB",76,240,NA,4.68,NA,33,117,4.43,7.25,NA,NA
-"14",2020,"James Morgan","Florida International","QB",76,213,NA,4.89,NA,29,112,4.64,7.51,NA,NA
-"15",2020,"Shea Patterson","Michigan","QB",73,202,NA,4.71,NA,31,116,4.5,7.14,NA,NA
-"16",2020,"Nate Stanley","Iowa","QB",76,243,NA,4.81,NA,28.5,108,4.48,7.26,NA,NA
-"17",2020,"Tua Tagovailoa","Alabama","QB",73,218,NA,NA,NA,NA,NA,NA,NA,NA,NA
-"714",2020,"Salvon Ahmed","Washington","RB",71,196,NA,4.62,NA,34.5,120,NA,NA,NA,NA
-"715",2020,"Cam Akers","Florida State","RB",71,212,NA,4.47,20,35.5,122,4.42,NA,NA,NA
-"716",2020,"Darius Anderson","Texas Christian","RB",71,195,NA,4.61,19,36,128,4.19,NA,NA,NA
-"717",2020,"Levante Bellamy","Western Michigan","RB",69,190,NA,4.5,16,39.5,125,NA,NA,NA,NA
-"718",2020,"Eno Benjamin","Arizona State","RB",69,195,NA,4.57,12,39,122,4.25,6.97,NA,NA
-"719",2020,"Raymond Calais","Louisiana-Lafayette","RB",69,185,NA,4.42,20,37.5,120,NA,NA,NA,NA
-"720",2020,"DeeJay Dallas","Miami (FL)","RB",70,210,NA,4.58,NA,33.5,119,4.32,7.18,NA,NA
-"721",2020,"A.J. Dillon","Boston College","RB",72,250,NA,4.53,23,41,131,NA,7.19,NA,NA
-"722",2020,"J.K. Dobbins","Ohio State","RB",70,217,NA,NA,23,NA,NA,NA,NA,NA,NA
-"723",2020,"Rico Dowdle","South Carolina","RB",72,215,NA,4.54,NA,38,127,NA,NA,NA,NA
-"724",2020,"Clyde Edwards-Helaire","Louisiana State","RB",68,205,NA,4.6,15,39.5,123,NA,NA,NA,NA
-"725",2020,"Darrynton Evans","Appalachian State (NC)","RB",71,200,NA,4.41,20,37,125,NA,NA,NA,NA
-"726",2020,"JaMycal Hasty","Baylor","RB",68,205,NA,4.55,15,39,123,4.03,NA,NA,NA
-"727",2020,"Brian Herrien","Georgia","RB",72,210,NA,4.62,18,38.5,126,4.4,7.12,NA,NA
-"728",2020,"Tony Jones","Notre Dame","RB",71,224,NA,4.68,13,32.5,119,4.21,7.18,NA,NA
-"729",2020,"Joshua Kelley","UCLA","RB",71,219,NA,4.49,23,31,121,4.28,6.95,NA,NA
-"730",2020,"Javon Leake","Maryland","RB",72,206,NA,4.65,NA,34,125,NA,NA,NA,NA
-"731",2020,"Benny LeMay","North Carolina Charlotte","RB",69,215,NA,4.75,24,28.5,112,NA,NA,NA,NA
-"732",2020,"Anthony McFarland","Maryland","RB",69,198,NA,4.44,NA,29.5,116,NA,NA,NA,NA
-"733",2020,"Zack Moss","Utah","RB",70,222,NA,4.65,19,33,NA,4.37,NA,NA,NA
-"734",2020,"Sewo Olonilua","Texas Christian","RB",75,240,NA,4.66,25,36,123,4.28,NA,NA,NA
-"735",2020,"La'Mical Perine","Florida","RB",71,211,NA,4.62,22,35,118,4.31,7.13,NA,NA
-"736",2020,"Scottie Phillips","Mississippi","RB",68,211,NA,4.56,29,30,114,4.53,7.4,NA,NA
-"737",2020,"James Robinson","Illinois State","RB",70,220,NA,4.64,24,40,125,4.19,7.03,NA,NA
-"738",2020,"D'Andre Swift","Georgia","RB",69,215,NA,4.48,NA,35.5,121,NA,NA,NA,NA
-"739",2020,"J.J. Taylor","Arizona","RB",66,185,NA,4.61,19,34.5,118,4.15,7,NA,NA
-"740",2020,"Jonathan Taylor","Wisconsin","RB",71,219,NA,4.39,17,36,123,4.24,7.01,NA,NA
-"741",2020,"Patrick Taylor","Memphis","RB",75,216,NA,4.57,15,34,123,4.34,NA,NA,NA
-"742",2020,"Ke'Shawn Vaughn","Vanderbilt","RB",70,205,NA,4.51,NA,32,117,NA,NA,NA,NA
-"743",2020,"Mike Warren","Cincinnati","RB",71,222,NA,NA,16,NA,NA,NA,NA,NA,NA
-"1841",2020,"Brandon Aiyuk","Arizona State","WR",72,201,NA,4.5,11,40,128,NA,NA,NA,NA
-"1842",2020,"Omar Bayless","Arkansas State","WR",75,207,NA,4.62,11,36,123,4.5,7.35,NA,NA
-"1843",2020,"Lynn Bowden","Kentucky","WR",73,199,NA,NA,13,NA,NA,NA,NA,NA,NA
-"1844",2020,"Tony Brown","Colorado","WR",73,195,NA,4.65,14,33.5,119,4.27,7.21,NA,NA
-"1845",2020,"Lawrence Cager","Georgia","WR",77,220,NA,NA,NA,NA,NA,NA,NA,NA,NA
-"1846",2020,"Marquez Callaway","Tennessee","WR",74,204,NA,4.55,NA,38,126,NA,NA,NA,NA
-"1847",2020,"Quintez Cephus","Wisconsin","WR",73,207,NA,4.73,23,38.5,124,4.33,7.2,NA,NA
-"1848",2020,"Chase Claypool","Notre Dame","WR",76,229,NA,4.42,19,40.5,126,NA,NA,NA,NA
-"1849",2020,"Tyrie Cleveland","Florida","WR",74,205,NA,4.46,13,39.5,126,NA,NA,NA,NA
-"1850",2020,"Isaiah Coulter","Rhode Island","WR",75,190,NA,4.45,NA,36,121,4.62,7.28,NA,NA
-"1851",2020,"Gabriel Davis","Central Florida","WR",75,212,NA,4.54,14,35,124,4.59,7.08,NA,NA
-"1852",2020,"Quartney Davis","Texas A&M","WR",73,200,NA,4.54,NA,35.5,NA,NA,NA,NA,NA
-"1853",2020,"Devin Duvernay","Texas","WR",71,202,NA,4.39,NA,35.5,123,4.2,7.13,NA,NA
-"1854",2020,"Bryan Edwards","South Carolina","WR",75,215,NA,NA,NA,NA,NA,NA,NA,NA,NA
-"1855",2020,"Chris Finke","Notre Dame","WR",70,184,NA,4.57,7,40,NA,NA,NA,NA,NA
-"1856",2020,"Aaron Fuller","Washington","WR",71,188,NA,4.59,NA,34,118,NA,7.14,NA,NA
-"1857",2020,"Antonio Gandy-Golden","Liberty (VA)","WR",76,220,NA,4.6,22,36,127,4.55,7.33,NA,NA
-"1858",2020,"Antonio Gibson","Memphis","WR",73,220,NA,4.39,16,35,118,NA,NA,NA,NA
-"1859",2020,"Stephen Guidry","Mississippi State","WR",76,200,NA,4.47,NA,34,125,4.46,7.31,NA,NA
-"1860",2020,"K.J. Hamler","Penn State","WR",69,176,NA,NA,15,NA,NA,NA,NA,NA,NA
-"1861",2020,"Tee Higgins","Clemson","WR",76,215,NA,NA,NA,NA,NA,NA,NA,NA,NA
-"1862",2020,"John Hightower","Boise State","WR",74,172,NA,4.43,NA,38.5,122,4.21,7.07,NA,NA
-"1863",2020,"K.J. Hill","Ohio State","WR",72,195,NA,4.6,17,32.5,114,NA,NA,NA,NA
-"1864",2020,"Isaiah Hodgins","Oregon State","WR",76,209,NA,4.61,9,36.5,124,4.12,7.01,NA,NA
-"1865",2020,"Trishton Jackson","Syracuse","WR",73,191,NA,4.5,NA,36,117,NA,NA,NA,NA
-"1866",2020,"Justin Jefferson","Louisiana State","WR",74,192,NA,4.43,NA,37.5,126,NA,NA,NA,NA
-"1867",2020,"Van Jefferson","Florida","WR",74,197,NA,NA,NA,NA,NA,NA,NA,NA,NA
-"1868",2020,"Jauan Jennings","Tennessee","WR",75,208,NA,4.72,NA,29,119,NA,NA,NA,NA
-"1869",2020,"Jerry Jeudy","Alabama","WR",73,192,NA,4.45,NA,35,120,4.53,NA,NA,NA
-"1870",2020,"Collin Johnson","Texas","WR",78,220,NA,NA,17,NA,NA,NA,NA,NA,NA
-"1871",2020,"Juwan Johnson","Oregon","WR",76,231,NA,4.58,14,33,124,4.37,6.94,NA,NA
-"1872",2020,"Tyler Johnson","Minnesota","WR",74,205,NA,NA,NA,NA,NA,NA,NA,NA,NA
-"1873",2020,"CeeDee Lamb","Oklahoma","WR",74,189,NA,4.5,11,34.5,124,NA,NA,NA,NA
-"1874",2020,"Kalija Lipscomb","Vanderbilt","WR",72,201,NA,4.57,16,32,127,NA,NA,NA,NA
-"1875",2020,"Austin Mack","Ohio State","WR",73,215,NA,4.59,NA,31.5,117,4.42,NA,NA,NA
-"1876",2020,"Denzel Mims","Baylor","WR",75,206,NA,4.38,16,38.5,131,4.43,6.66,NA,NA
-"1877",2020,"Darnell Mooney","Tulane (LA)","WR",76,312,NA,4.38,9,37,124,NA,NA,NA,NA
-"1878",2020,"K.J. Osborn","Miami (FL)","WR",72,206,NA,4.48,18,37.5,123,4.35,7,NA,NA
-"1879",2020,"Aaron Parker","Rhode Island","WR",75,208,NA,4.57,12,26.5,112,4.23,6.94,NA,NA
-"1880",2020,"Dezmon Patmon","Washington State","WR",76,228,NA,4.48,15,36,132,4.38,7.28,NA,NA
-"1881",2020,"Donovan Peoples-Jones","Michigan","WR",74,208,NA,4.48,NA,44.5,139,NA,NA,NA,NA
-"1882",2020,"Malcolm Perry","Navy","WR",69,190,NA,4.63,10,36,122,4.31,7.12,NA,NA
-"1883",2020,"Michael Pittman","Southern California","WR",76,220,NA,4.52,13,36.5,121,4.14,6.96,NA,NA
-"1884",2020,"James Proche","Southern Methodist (TX)","WR",71,193,NA,NA,20,34.5,NA,4.4,7.27,NA,NA
-"1885",2020,"Jalen Reagor","Texas Christian","WR",71,195,NA,4.47,17,42,138,4.46,7.31,NA,NA
-"1886",2020,"Joe Reed","Virginia","WR",73,215,NA,4.47,21,38,123,NA,NA,NA,NA
-"1887",2020,"Kendrick Rogers","Texas A&M","WR",76,204,NA,4.51,17,35.5,124,4.48,7.13,NA,NA
-"1888",2020,"Henry Ruggs","Alabama","WR",72,190,NA,4.27,NA,42,131,NA,NA,NA,NA
-"1889",2020,"Laviska Shenault","Colorado","WR",74,220,NA,4.58,17,NA,NA,NA,NA,NA,NA
-"1890",2020,"Darrell Stewart","Michigan State","WR",74,216,NA,NA,15,35,117,NA,NA,NA,NA
-"1891",2020,"Freddie Swain","Florida","WR",72,199,NA,4.46,16,36.5,124,4.26,7.05,NA,NA
-"1892",2020,"Jeff Thomas","Miami (FL)","WR",70,174,NA,4.45,NA,36.5,125,NA,NA,NA,NA
-"1893",2020,"Ben Victor","Ohio State","WR",76,199,NA,4.6,9,35,128,NA,7.1,NA,NA
-"1894",2020,"Quez Watkins","Southern Mississippi","WR",74,190,NA,4.35,NA,36.5,125,4.36,7.28,NA,NA
-"1895",2020,"Cody White","Michigan State","WR",75,215,NA,4.66,NA,35.5,120,4.52,7.19,NA,NA
-"3544",2020,"Devin Asiasi","UCLA","TE",75,260,NA,4.73,16,30.5,115,NA,NA,NA,NA
-"3545",2020,"Jacob Breeland","Oregon","TE",77,250,NA,NA,NA,NA,NA,NA,NA,NA,NA
-"3546",2020,"Harrison Bryant","Florida Atlantic","TE",77,240,NA,4.73,13,32.5,110,4.37,7.41,NA,NA
-"3547",2020,"Hunter Bryant","Washington","TE",74,239,NA,4.74,23,32.5,115,4.46,7.08,NA,NA
-"3548",2020,"Josiah Deguara","Cincinnati","TE",75,245,NA,4.72,25,35.5,115,4.35,7.15,NA,NA
-"3549",2020,"Brycen Hopkins","Purdue","TE",76,245,NA,4.66,21,33.5,116,4.28,7.25,NA,NA
-"3550",2020,"Dalton Keene","Virginia Tech","TE",76,251,NA,4.71,21,34,125,4.19,7.07,NA,NA
-"3551",2020,"Cole Kmet","Notre Dame","TE",76,250,NA,4.7,NA,37,123,4.41,7.44,NA,NA
-"3552",2020,"Sean McKeon","Michigan","TE",77,238,NA,NA,18,NA,NA,NA,NA,NA,NA
-"3553",2020,"Thaddeus Moss","Louisiana State","TE",75,249,NA,NA,NA,NA,NA,NA,NA,NA,NA
-"3554",2020,"C.J. O'Grady","Arkansas","TE",76,256,NA,4.81,16,34,119,4.34,7.3,NA,NA
-"3555",2020,"Albert Okwuegbunam","Missouri","TE",77,255,NA,4.49,NA,NA,NA,NA,NA,NA,NA
-"3556",2020,"Colby Parkinson","Stanford","TE",79,251,NA,4.77,18,32.5,109,4.46,7.15,NA,NA
-"3557",2020,"Jared Pinkney","Vanderbilt","TE",76,254,NA,4.96,23,NA,NA,NA,NA,NA,NA
-"3558",2020,"Stephen Sullivan","Louisiana State","TE",77,242,NA,4.66,NA,36.5,123,4.62,7.51,NA,NA
-"3559",2020,"Charlie Taumoepeau","Portland State (OR)","TE",74,245,NA,4.75,18,36.5,121,4.27,7,NA,NA
-"3560",2020,"Adam Trautman","Dayton","TE",77,253,NA,4.8,18,34.5,114,4.27,6.78,NA,NA
-"3561",2020,"Mitchell Wilcox","South Florida","TE",77,245,NA,4.88,NA,31,112,4.43,7.37,NA,NA
-"3562",2020,"Charlie Woerner","Georgia","TE",77,245,NA,4.78,21,34.5,120,4.46,7.18,NA,NA
-"3563",2020,"Dom Wood-Anderson","Tennessee","TE",76,257,NA,4.92,NA,35,119,NA,NA,NA,NA
-"9770",2020,"Damon Arnette","Ohio State","DB",72,195,NA,4.56,NA,NA,NA,NA,NA,NA,NA
-"9771",2020,"Grayland Arnold","Baylor","DB",70,190,NA,4.59,12,33,120,4.3,7.01,NA,NA
-"9772",2020,"Trajan Bandy","Miami (FL)","DB",69,186,NA,4.5,10,NA,NA,NA,NA,NA,NA
-"9773",2020,"Essang Bassey","Wake Forest","DB",69,190,NA,4.46,12,39.5,128,4.13,6.95,NA,NA
-"9774",2020,"Myles Bryant","Washington","DB",69,185,NA,4.62,NA,31.5,115,4.02,6.81,NA,NA
-"9775",2020,"Nevelle Clarke","Central Florida","DB",73,187,NA,NA,10,35,126,4.31,6.88,NA,NA
-"9776",2020,"Cameron Dantzler","Mississippi State","DB",74,185,NA,4.64,NA,34.5,NA,NA,NA,NA,NA
-"9777",2020,"Javaris Davis","Auburn","DB",70,180,NA,4.39,11,35.5,124,NA,NA,NA,NA
-"9778",2020,"Trevon Diggs","Alabama","DB",74,207,NA,NA,NA,NA,NA,NA,NA,NA,NA
-"9779",2020,"Kristian Fulton","Louisiana State","DB",72,200,NA,4.46,NA,35.5,123,4.36,6.94,NA,NA
-"9780",2020,"Jeff Gladney","Texas Christian","DB",72,183,NA,4.48,17,37.5,124,NA,7.26,NA,NA
-"9781",2020,"A.J. Green","Oklahoma State","DB",73,199,NA,4.62,13,NA,NA,NA,NA,NA,NA
-"9782",2020,"Bryce Hall","Virginia","DB",73,200,NA,NA,11,NA,NA,NA,NA,NA,NA
-"9783",2020,"Harrison Hand","Temple","DB",72,192,NA,4.52,14,41,133,4.27,7.15,NA,NA
-"9784",2020,"C.J. Henderson","Florida","DB",73,202,NA,4.39,20,37.5,127,NA,NA,NA,NA
-"9785",2020,"Lavert Hill","Michigan","DB",71,182,NA,NA,21,NA,NA,NA,NA,NA,NA
-"9786",2020,"Darnay Holmes","UCLA","DB",70,192,NA,4.48,12,NA,NA,NA,NA,NA,NA
-"9787",2020,"Noah Igbinoghene","Auburn","DB",71,200,NA,4.48,15,37,128,NA,NA,NA,NA
-"9788",2020,"Dane Jackson","Pittsburgh","DB",72,180,NA,4.57,NA,35,122,4.27,7.07,NA,NA
-"9789",2020,"Lamar Jackson","Nebraska","DB",74,206,NA,4.58,10,36.5,122,NA,NA,NA,NA
-"9790",2020,"Jaylon Johnson","Utah","DB",72,195,NA,4.5,15,36.5,124,4.13,7.01,NA,NA
-"9791",2020,"BoPete Keyes","Tulane (LA)","DB",73,200,NA,NA,NA,36,126,NA,NA,NA,NA
-"9792",2020,"Michael Ojemudia","Iowa","DB",72,200,NA,4.45,NA,36,122,4.21,6.87,NA,NA
-"9793",2020,"Jeff Okudah","Ohio State","DB",73,200,NA,4.48,11,41,135,NA,NA,NA,NA
-"9794",2020,"James Pierre","Florida Atlantic","DB",74,185,NA,4.59,NA,33.5,123,NA,7.02,NA,NA
-"9795",2020,"Troy Pride","Notre Dame","DB",71,194,NA,4.4,13,35.5,119,4.26,6.94,NA,NA
-"9796",2020,"John Reid","Penn State","DB",70,181,NA,4.49,20,36.5,129,3.97,6.95,NA,NA
-"9797",2020,"Amik Robertson","Louisiana Tech","DB",69,183,NA,NA,NA,NA,NA,NA,NA,NA,NA
-"9798",2020,"Reggie Robinson","Tulsa (OK)","DB",73,197,NA,4.44,22,36,132,4.18,7.09,NA,NA
-"9799",2020,"Stanford Samuels","Florida State","DB",74,185,NA,4.65,NA,NA,NA,NA,NA,NA,NA
-"9800",2020,"Josiah Scott","Michigan State","DB",70,171,NA,4.42,17,NA,NA,NA,NA,NA,NA
-"9801",2020,"A.J. Terrell","Clemson","DB",73,190,NA,4.42,15,34.5,129,NA,NA,NA,NA
-"9802",2020,"Stantley Thomas-Oliver","Florida International","DB",74,184,NA,4.48,NA,34,127,NA,NA,NA,NA
-"9803",2020,"Kindle Vildor","Georgia Southern","DB",70,185,NA,4.44,22,39.5,133,4.28,7.14,NA,NA
+,Season,Name,College,Position,Height,Weight,Wonderlic,Forty,Bench,Vert,Broad,Shuttle,ThreeCone,Pro Bowls,All Pros
+1,2020,Kelly Bryant,Missouri,QB,75,225,NA,4.69,NA,35,125,4.51,7.33,NA,NA
+2,2020,Joe Burrow,Louisiana State,QB,76,216,NA,NA,NA,NA,NA,NA,NA,NA,NA
+3,2020,Kevin Davidson,Princeton,QB,76,225,NA,5,NA,28,109,4.37,7.13,NA,NA
+4,2020,Jacob Eason,Washington,QB,78,227,NA,4.89,NA,27.5,110,4.75,7.5,NA,NA
+5,2020,Jake Fromm,Georgia,QB,74,220,NA,5.01,NA,30,111,4.51,7.27,NA,NA
+6,2020,Anthony Gordon,Washington State,QB,74,199,NA,NA,NA,NA,NA,NA,NA,NA,NA
+7,2020,Justin Herbert,Oregon,QB,78,227,NA,4.68,NA,35.5,123,4.46,7.06,NA,NA
+8,2020,Jalen Hurts,Oklahoma,QB,73,218,NA,4.59,NA,35,125,NA,NA,NA,NA
+9,2020,Brian Lewerke,Michigan State,QB,75,216,NA,4.95,NA,31,113,4.4,7.14,NA,NA
+10,2020,Jordan Love,Utah State,QB,76,225,NA,4.74,NA,35.5,118,4.52,7.21,NA,NA
+11,2020,Jake Luton,Oregon State,QB,79,229,NA,NA,NA,NA,NA,NA,NA,NA,NA
+12,2020,Cole McDonald,Hawaii,QB,76,220,NA,4.58,NA,36,121,4.52,7.13,NA,NA
+13,2020,Steven Montez,Colorado,QB,76,240,NA,4.68,NA,33,117,4.43,7.25,NA,NA
+14,2020,James Morgan,Florida International,QB,76,213,NA,4.89,NA,29,112,4.64,7.51,NA,NA
+15,2020,Shea Patterson,Michigan,QB,73,202,NA,4.71,NA,31,116,4.5,7.14,NA,NA
+16,2020,Nate Stanley,Iowa,QB,76,243,NA,4.81,NA,28.5,108,4.48,7.26,NA,NA
+17,2020,Tua Tagovailoa,Alabama,QB,73,218,NA,NA,NA,NA,NA,NA,NA,NA,NA
+714,2020,Salvon Ahmed,Washington,RB,71,196,NA,4.62,NA,34.5,120,NA,NA,NA,NA
+715,2020,Cam Akers,Florida State,RB,71,212,NA,4.47,20,35.5,122,4.42,NA,NA,NA
+716,2020,Darius Anderson,Texas Christian,RB,71,195,NA,4.61,19,36,128,4.19,NA,NA,NA
+717,2020,Levante Bellamy,Western Michigan,RB,69,190,NA,4.5,16,39.5,125,NA,NA,NA,NA
+718,2020,Eno Benjamin,Arizona State,RB,69,195,NA,4.57,12,39,122,4.25,6.97,NA,NA
+719,2020,Raymond Calais,Louisiana-Lafayette,RB,69,185,NA,4.42,20,37.5,120,NA,NA,NA,NA
+720,2020,DeeJay Dallas,Miami (FL),RB,70,210,NA,4.58,NA,33.5,119,4.32,7.18,NA,NA
+721,2020,A.J. Dillon,Boston College,RB,72,250,NA,4.53,23,41,131,NA,7.19,NA,NA
+722,2020,J.K. Dobbins,Ohio State,RB,70,217,NA,NA,23,NA,NA,NA,NA,NA,NA
+723,2020,Rico Dowdle,South Carolina,RB,72,215,NA,4.54,NA,38,127,NA,NA,NA,NA
+724,2020,Clyde Edwards-Helaire,Louisiana State,RB,68,205,NA,4.6,15,39.5,123,NA,NA,NA,NA
+725,2020,Darrynton Evans,Appalachian State (NC),RB,71,200,NA,4.41,20,37,125,NA,NA,NA,NA
+726,2020,JaMycal Hasty,Baylor,RB,68,205,NA,4.55,15,39,123,4.03,NA,NA,NA
+727,2020,Brian Herrien,Georgia,RB,72,210,NA,4.62,18,38.5,126,4.4,7.12,NA,NA
+728,2020,Tony Jones,Notre Dame,RB,71,224,NA,4.68,13,32.5,119,4.21,7.18,NA,NA
+729,2020,Joshua Kelley,UCLA,RB,71,219,NA,4.49,23,31,121,4.28,6.95,NA,NA
+730,2020,Javon Leake,Maryland,RB,72,206,NA,4.65,NA,34,125,NA,NA,NA,NA
+731,2020,Benny LeMay,North Carolina Charlotte,RB,69,215,NA,4.75,24,28.5,112,NA,NA,NA,NA
+732,2020,Anthony McFarland,Maryland,RB,69,198,NA,4.44,NA,29.5,116,NA,NA,NA,NA
+733,2020,Zack Moss,Utah,RB,70,222,NA,4.65,19,33,NA,4.37,NA,NA,NA
+734,2020,Sewo Olonilua,Texas Christian,RB,75,240,NA,4.66,25,36,123,4.28,NA,NA,NA
+735,2020,La'Mical Perine,Florida,RB,71,211,NA,4.62,22,35,118,4.31,7.13,NA,NA
+736,2020,Scottie Phillips,Mississippi,RB,68,211,NA,4.56,29,30,114,4.53,7.4,NA,NA
+737,2020,James Robinson,Illinois State,RB,70,220,NA,4.64,24,40,125,4.19,7.03,NA,NA
+738,2020,D'Andre Swift,Georgia,RB,69,215,NA,4.48,NA,35.5,121,NA,NA,NA,NA
+739,2020,J.J. Taylor,Arizona,RB,66,185,NA,4.61,19,34.5,118,4.15,7,NA,NA
+740,2020,Jonathan Taylor,Wisconsin,RB,71,219,NA,4.39,17,36,123,4.24,7.01,NA,NA
+741,2020,Patrick Taylor,Memphis,RB,75,216,NA,4.57,15,34,123,4.34,NA,NA,NA
+742,2020,Ke'Shawn Vaughn,Vanderbilt,RB,70,205,NA,4.51,NA,32,117,NA,NA,NA,NA
+743,2020,Mike Warren,Cincinnati,RB,71,222,NA,NA,16,NA,NA,NA,NA,NA,NA
+1841,2020,Brandon Aiyuk,Arizona State,WR,72,201,NA,4.5,11,40,128,NA,NA,NA,NA
+1842,2020,Omar Bayless,Arkansas State,WR,75,207,NA,4.62,11,36,123,4.5,7.35,NA,NA
+1843,2020,Lynn Bowden,Kentucky,WR,73,199,NA,NA,13,NA,NA,NA,NA,NA,NA
+1844,2020,Tony Brown,Colorado,WR,73,195,NA,4.65,14,33.5,119,4.27,7.21,NA,NA
+1845,2020,Lawrence Cager,Georgia,WR,77,220,NA,NA,NA,NA,NA,NA,NA,NA,NA
+1846,2020,Marquez Callaway,Tennessee,WR,74,204,NA,4.55,NA,38,126,NA,NA,NA,NA
+1847,2020,Quintez Cephus,Wisconsin,WR,73,207,NA,4.73,23,38.5,124,4.33,7.2,NA,NA
+1848,2020,Chase Claypool,Notre Dame,WR,76,229,NA,4.42,19,40.5,126,NA,NA,NA,NA
+1849,2020,Tyrie Cleveland,Florida,WR,74,205,NA,4.46,13,39.5,126,NA,NA,NA,NA
+1850,2020,Isaiah Coulter,Rhode Island,WR,75,190,NA,4.45,NA,36,121,4.62,7.28,NA,NA
+1851,2020,Gabriel Davis,Central Florida,WR,75,212,NA,4.54,14,35,124,4.59,7.08,NA,NA
+1852,2020,Quartney Davis,Texas A&M,WR,73,200,NA,4.54,NA,35.5,NA,NA,NA,NA,NA
+1853,2020,Devin Duvernay,Texas,WR,71,202,NA,4.39,NA,35.5,123,4.2,7.13,NA,NA
+1854,2020,Bryan Edwards,South Carolina,WR,75,215,NA,NA,NA,NA,NA,NA,NA,NA,NA
+1855,2020,Chris Finke,Notre Dame,WR,70,184,NA,4.57,7,40,NA,NA,NA,NA,NA
+1856,2020,Aaron Fuller,Washington,WR,71,188,NA,4.59,NA,34,118,NA,7.14,NA,NA
+1857,2020,Antonio Gandy-Golden,Liberty (VA),WR,76,220,NA,4.6,22,36,127,4.55,7.33,NA,NA
+1858,2020,Antonio Gibson,Memphis,WR,73,220,NA,4.39,16,35,118,NA,NA,NA,NA
+1859,2020,Stephen Guidry,Mississippi State,WR,76,200,NA,4.47,NA,34,125,4.46,7.31,NA,NA
+1860,2020,K.J. Hamler,Penn State,WR,69,176,NA,NA,15,NA,NA,NA,NA,NA,NA
+1861,2020,Tee Higgins,Clemson,WR,76,215,NA,NA,NA,NA,NA,NA,NA,NA,NA
+1862,2020,John Hightower,Boise State,WR,74,172,NA,4.43,NA,38.5,122,4.21,7.07,NA,NA
+1863,2020,K.J. Hill,Ohio State,WR,72,195,NA,4.6,17,32.5,114,NA,NA,NA,NA
+1864,2020,Isaiah Hodgins,Oregon State,WR,76,209,NA,4.61,9,36.5,124,4.12,7.01,NA,NA
+1865,2020,Trishton Jackson,Syracuse,WR,73,191,NA,4.5,NA,36,117,NA,NA,NA,NA
+1866,2020,Justin Jefferson,Louisiana State,WR,74,192,NA,4.43,NA,37.5,126,NA,NA,NA,NA
+1867,2020,Van Jefferson,Florida,WR,74,197,NA,NA,NA,NA,NA,NA,NA,NA,NA
+1868,2020,Jauan Jennings,Tennessee,WR,75,208,NA,4.72,NA,29,119,NA,NA,NA,NA
+1869,2020,Jerry Jeudy,Alabama,WR,73,192,NA,4.45,NA,35,120,4.53,NA,NA,NA
+1870,2020,Collin Johnson,Texas,WR,78,220,NA,NA,17,NA,NA,NA,NA,NA,NA
+1871,2020,Juwan Johnson,Oregon,WR,76,231,NA,4.58,14,33,124,4.37,6.94,NA,NA
+1872,2020,Tyler Johnson,Minnesota,WR,74,205,NA,NA,NA,NA,NA,NA,NA,NA,NA
+1873,2020,CeeDee Lamb,Oklahoma,WR,74,189,NA,4.5,11,34.5,124,NA,NA,NA,NA
+1874,2020,Kalija Lipscomb,Vanderbilt,WR,72,201,NA,4.57,16,32,127,NA,NA,NA,NA
+1875,2020,Austin Mack,Ohio State,WR,73,215,NA,4.59,NA,31.5,117,4.42,NA,NA,NA
+1876,2020,Denzel Mims,Baylor,WR,75,206,NA,4.38,16,38.5,131,4.43,6.66,NA,NA
+1877,2020,Darnell Mooney,Tulane (LA),WR,76,312,NA,4.38,9,37,124,NA,NA,NA,NA
+1878,2020,K.J. Osborn,Miami (FL),WR,72,206,NA,4.48,18,37.5,123,4.35,7,NA,NA
+1879,2020,Aaron Parker,Rhode Island,WR,75,208,NA,4.57,12,26.5,112,4.23,6.94,NA,NA
+1880,2020,Dezmon Patmon,Washington State,WR,76,228,NA,4.48,15,36,132,4.38,7.28,NA,NA
+1881,2020,Donovan Peoples-Jones,Michigan,WR,74,208,NA,4.48,NA,44.5,139,NA,NA,NA,NA
+1882,2020,Malcolm Perry,Navy,WR,69,190,NA,4.63,10,36,122,4.31,7.12,NA,NA
+1883,2020,Michael Pittman,Southern California,WR,76,220,NA,4.52,13,36.5,121,4.14,6.96,NA,NA
+1884,2020,James Proche,Southern Methodist (TX),WR,71,193,NA,NA,20,34.5,NA,4.4,7.27,NA,NA
+1885,2020,Jalen Reagor,Texas Christian,WR,71,195,NA,4.47,17,42,138,4.46,7.31,NA,NA
+1886,2020,Joe Reed,Virginia,WR,73,215,NA,4.47,21,38,123,NA,NA,NA,NA
+1887,2020,Kendrick Rogers,Texas A&M,WR,76,204,NA,4.51,17,35.5,124,4.48,7.13,NA,NA
+1888,2020,Henry Ruggs,Alabama,WR,72,190,NA,4.27,NA,42,131,NA,NA,NA,NA
+1889,2020,Laviska Shenault,Colorado,WR,74,220,NA,4.58,17,NA,NA,NA,NA,NA,NA
+1890,2020,Darrell Stewart,Michigan State,WR,74,216,NA,NA,15,35,117,NA,NA,NA,NA
+1891,2020,Freddie Swain,Florida,WR,72,199,NA,4.46,16,36.5,124,4.26,7.05,NA,NA
+1892,2020,Jeff Thomas,Miami (FL),WR,70,174,NA,4.45,NA,36.5,125,NA,NA,NA,NA
+1893,2020,Ben Victor,Ohio State,WR,76,199,NA,4.6,9,35,128,NA,7.1,NA,NA
+1894,2020,Quez Watkins,Southern Mississippi,WR,74,190,NA,4.35,NA,36.5,125,4.36,7.28,NA,NA
+1895,2020,Cody White,Michigan State,WR,75,215,NA,4.66,NA,35.5,120,4.52,7.19,NA,NA
+3544,2020,Devin Asiasi,UCLA,TE,75,260,NA,4.73,16,30.5,115,NA,NA,NA,NA
+3545,2020,Jacob Breeland,Oregon,TE,77,250,NA,NA,NA,NA,NA,NA,NA,NA,NA
+3546,2020,Harrison Bryant,Florida Atlantic,TE,77,240,NA,4.73,13,32.5,110,4.37,7.41,NA,NA
+3547,2020,Hunter Bryant,Washington,TE,74,239,NA,4.74,23,32.5,115,4.46,7.08,NA,NA
+3548,2020,Josiah Deguara,Cincinnati,TE,75,245,NA,4.72,25,35.5,115,4.35,7.15,NA,NA
+3549,2020,Brycen Hopkins,Purdue,TE,76,245,NA,4.66,21,33.5,116,4.28,7.25,NA,NA
+3550,2020,Dalton Keene,Virginia Tech,TE,76,251,NA,4.71,21,34,125,4.19,7.07,NA,NA
+3551,2020,Cole Kmet,Notre Dame,TE,76,250,NA,4.7,NA,37,123,4.41,7.44,NA,NA
+3552,2020,Sean McKeon,Michigan,TE,77,238,NA,NA,18,NA,NA,NA,NA,NA,NA
+3553,2020,Thaddeus Moss,Louisiana State,TE,75,249,NA,NA,NA,NA,NA,NA,NA,NA,NA
+3554,2020,C.J. O'Grady,Arkansas,TE,76,256,NA,4.81,16,34,119,4.34,7.3,NA,NA
+3555,2020,Albert Okwuegbunam,Missouri,TE,77,255,NA,4.49,NA,NA,NA,NA,NA,NA,NA
+3556,2020,Colby Parkinson,Stanford,TE,79,251,NA,4.77,18,32.5,109,4.46,7.15,NA,NA
+3557,2020,Jared Pinkney,Vanderbilt,TE,76,254,NA,4.96,23,NA,NA,NA,NA,NA,NA
+3558,2020,Stephen Sullivan,Louisiana State,TE,77,242,NA,4.66,NA,36.5,123,4.62,7.51,NA,NA
+3559,2020,Charlie Taumoepeau,Portland State (OR),TE,74,245,NA,4.75,18,36.5,121,4.27,7,NA,NA
+3560,2020,Adam Trautman,Dayton,TE,77,253,NA,4.8,18,34.5,114,4.27,6.78,NA,NA
+3561,2020,Mitchell Wilcox,South Florida,TE,77,245,NA,4.88,NA,31,112,4.43,7.37,NA,NA
+3562,2020,Charlie Woerner,Georgia,TE,77,245,NA,4.78,21,34.5,120,4.46,7.18,NA,NA
+3563,2020,Dom Wood-Anderson,Tennessee,TE,76,257,NA,4.92,NA,35,119,NA,NA,NA,NA
+9770,2020,Damon Arnette,Ohio State,DB,72,195,NA,4.56,NA,NA,NA,NA,NA,NA,NA
+9771,2020,Grayland Arnold,Baylor,DB,70,190,NA,4.59,12,33,120,4.3,7.01,NA,NA
+9772,2020,Trajan Bandy,Miami (FL),DB,69,186,NA,4.5,10,NA,NA,NA,NA,NA,NA
+9773,2020,Essang Bassey,Wake Forest,DB,69,190,NA,4.46,12,39.5,128,4.13,6.95,NA,NA
+9774,2020,Myles Bryant,Washington,DB,69,185,NA,4.62,NA,31.5,115,4.02,6.81,NA,NA
+9775,2020,Nevelle Clarke,Central Florida,DB,73,187,NA,NA,10,35,126,4.31,6.88,NA,NA
+9776,2020,Cameron Dantzler,Mississippi State,DB,74,185,NA,4.64,NA,34.5,NA,NA,NA,NA,NA
+9777,2020,Javaris Davis,Auburn,DB,70,180,NA,4.39,11,35.5,124,NA,NA,NA,NA
+9778,2020,Trevon Diggs,Alabama,DB,74,207,NA,NA,NA,NA,NA,NA,NA,NA,NA
+9779,2020,Kristian Fulton,Louisiana State,DB,72,200,NA,4.46,NA,35.5,123,4.36,6.94,NA,NA
+9780,2020,Jeff Gladney,Texas Christian,DB,72,183,NA,4.48,17,37.5,124,NA,7.26,NA,NA
+9781,2020,A.J. Green,Oklahoma State,DB,73,199,NA,4.62,13,NA,NA,NA,NA,NA,NA
+9782,2020,Bryce Hall,Virginia,DB,73,200,NA,NA,11,NA,NA,NA,NA,NA,NA
+9783,2020,Harrison Hand,Temple,DB,72,192,NA,4.52,14,41,133,4.27,7.15,NA,NA
+9784,2020,C.J. Henderson,Florida,DB,73,202,NA,4.39,20,37.5,127,NA,NA,NA,NA
+9785,2020,Lavert Hill,Michigan,DB,71,182,NA,NA,21,NA,NA,NA,NA,NA,NA
+9786,2020,Darnay Holmes,UCLA,DB,70,192,NA,4.48,12,NA,NA,NA,NA,NA,NA
+9787,2020,Noah Igbinoghene,Auburn,DB,71,200,NA,4.48,15,37,128,NA,NA,NA,NA
+9788,2020,Dane Jackson,Pittsburgh,DB,72,180,NA,4.57,NA,35,122,4.27,7.07,NA,NA
+9789,2020,Lamar Jackson,Nebraska,DB,74,206,NA,4.58,10,36.5,122,NA,NA,NA,NA
+9790,2020,Jaylon Johnson,Utah,DB,72,195,NA,4.5,15,36.5,124,4.13,7.01,NA,NA
+9791,2020,BoPete Keyes,Tulane (LA),DB,73,200,NA,NA,NA,36,126,NA,NA,NA,NA
+9792,2020,Michael Ojemudia,Iowa,DB,72,200,NA,4.45,NA,36,122,4.21,6.87,NA,NA
+9793,2020,Jeff Okudah,Ohio State,DB,73,200,NA,4.48,11,41,135,NA,NA,NA,NA
+9794,2020,James Pierre,Florida Atlantic,DB,74,185,NA,4.59,NA,33.5,123,NA,7.02,NA,NA
+9795,2020,Troy Pride,Notre Dame,DB,71,194,NA,4.4,13,35.5,119,4.26,6.94,NA,NA
+9796,2020,John Reid,Penn State,DB,70,181,NA,4.49,20,36.5,129,3.97,6.95,NA,NA
+9797,2020,Amik Robertson,Louisiana Tech,DB,69,183,NA,NA,NA,NA,NA,NA,NA,NA,NA
+9798,2020,Reggie Robinson,Tulsa (OK),DB,73,197,NA,4.44,22,36,132,4.18,7.09,NA,NA
+9799,2020,Stanford Samuels,Florida State,DB,74,185,NA,4.65,NA,NA,NA,NA,NA,NA,NA
+9800,2020,Josiah Scott,Michigan State,DB,70,171,NA,4.42,17,NA,NA,NA,NA,NA,NA
+9801,2020,A.J. Terrell,Clemson,DB,73,190,NA,4.42,15,34.5,129,NA,NA,NA,NA
+9802,2020,Stantley Thomas-Oliver,Florida International,DB,74,184,NA,4.48,NA,34,127,NA,NA,NA,NA
+9803,2020,Kindle Vildor,Georgia Southern,DB,70,185,NA,4.44,22,39.5,133,4.28,7.14,NA,NA

@@ -1,0 +1,124 @@
+---
+title: "Draft Position to Predict AV"
+author: "Jason Gardner"
+date: "April 16, 2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+library(dplyr)
+curr <- read.csv('DataUpdate4.csv')
+qb <- filter(curr, Position == 'QB')
+write.csv(qb, 'QBs.csv')
+rb <- filter(curr, Position == 'RB')
+write.csv(rb, 'RBs.csv')
+wr <- filter(curr, Position == 'WR')
+write.csv(wr, 'WRs.csv')
+te <- filter(curr, Position == 'TE')
+write.csv(te, 'TEs.csv')
+ol <- filter(curr, Position == 'OL')
+write.csv(ol, 'OLs.csv')
+kick <- filter(curr, Position == 'K')
+write.csv(kick, 'Kickers.csv')
+punt <- filter(curr, Position == 'P')
+write.csv(punt, 'Punters.csv')
+dl <- filter(curr, Position == 'DL')
+write.csv(dl, 'DLs.csv')
+lb <- filter(curr, Position == 'LB')
+write.csv(lb, 'LBs.csv')
+db <- filter(curr, Position == 'DB')
+write.csv(db, 'DBs.csv')
+```
+
+```{r}
+
+ovr_lm <- lm(AV16 ~ PickNumber, data=curr)
+summary(ovr_lm)
+plot(curr$PickNumber, curr$AV16, col=curr$Position, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='All Players Approximate Value Per 16 vs Draft Position')
+abline(ovr_lm$coefficients[1], ovr_lm$coefficients[2], col='green')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+legend('topright', legend = levels(curr$Position), col = 1:10, cex = 0.8, pch = 1)
+lab=paste0('AVPer16 = ', round(ovr_lm$coefficients[2], 3),'*Draft Position + ', round(ovr_lm$coefficients[1],3), '   R^2 = ', round(summary(ovr_lm)$r.squared, 3))
+text(50, 18, adj=c(0,0), labels=lab)
+
+
+qb_lm <- lm(AV16 ~ PickNumber, data=qb)
+summary(qb_lm)
+plot(qb$PickNumber, qb$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Quarterbacks Approximate Value Per 16 vs Draft Position')
+abline(qb_lm$coefficients[1], qb_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(qb_lm$coefficients[2], 3),'*Draft Position + ', round(qb_lm$coefficients[1],3), '   R^2 = ', round(summary(qb_lm)$r.squared, 3))
+text(75, 18, adj=c(0,0), labels=lab)
+
+
+rb_lm <- lm(AV16 ~ PickNumber, data=rb)
+summary(rb_lm)
+plot(rb$PickNumber, rb$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Running Backs Approximate Value Per 16 vs Draft Position')
+abline(rb_lm$coefficients[1], rb_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(rb_lm$coefficients[2], 3),'*Draft Position + ', round(rb_lm$coefficients[1],3), '   R^2 = ', round(summary(rb_lm)$r.squared, 3))
+text(75, 14, adj=c(0,0), labels=lab)
+
+
+wr_lm <- lm(AV16 ~ PickNumber, data=wr)
+summary(wr_lm)
+plot(wr$PickNumber, wr$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Wide Receivers Approximate Value Per 16 vs Draft Position')
+abline(wr_lm$coefficients[1], wr_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(wr_lm$coefficients[2], 3),'*Draft Position + ', round(wr_lm$coefficients[1],3), '   R^2 = ', round(summary(wr_lm)$r.squared, 3))
+text(75, 14, adj=c(0,0), labels=lab)
+
+
+te_lm <- lm(AV16 ~ PickNumber, data=te)
+summary(te_lm)
+plot(te$PickNumber, te$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Tight Ends Approximate Value Per 16 vs Draft Position')
+abline(te_lm$coefficients[1], te_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(te_lm$coefficients[2], 3),'*Draft Position + ', round(te_lm$coefficients[1],3), '   R^2 = ', round(summary(te_lm)$r.squared, 3))
+text(75, 10, adj=c(0,0), labels=lab)
+
+
+ol_lm <- lm(AV16 ~ PickNumber, data=ol)
+summary(ol_lm)
+plot(ol$PickNumber, ol$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Offensive Linemen Approximate Value Per 16 vs Draft Position')
+abline(ol_lm$coefficients[1], ol_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(ol_lm$coefficients[2], 3),'*Draft Position + ', round(ol_lm$coefficients[1],3), '   R^2 = ', round(summary(ol_lm)$r.squared, 3))
+text(75, 12, adj=c(0,0), labels=lab)
+
+
+dl_lm <- lm(AV16 ~ PickNumber, data=dl)
+summary(dl_lm)
+plot(dl$PickNumber, dl$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Defensive Linemen Approximate Value Per 16 vs Draft Position')
+abline(dl_lm$coefficients[1], dl_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(dl_lm$coefficients[2], 3),'*Draft Position + ', round(dl_lm$coefficients[1],3), '   R^2 = ', round(summary(dl_lm)$r.squared, 3))
+text(75, 14, adj=c(0,0), labels=lab)
+
+
+lb_lm <- lm(AV16 ~ PickNumber, data=lb)
+summary(lb_lm)
+plot(lb$PickNumber, lb$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Linebackers Approximate Value Per 16 vs Draft Position')
+abline(lb_lm$coefficients[1], lb_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(lb_lm$coefficients[2], 3),'*Draft Position + ', round(lb_lm$coefficients[1],3), '   R^2 = ', round(summary(lb_lm)$r.squared, 3))
+text(75, 14, adj=c(0,0), labels=lab)
+
+
+db_lm <- lm(AV16 ~ PickNumber, data=db)
+summary(db_lm)
+plot(db$PickNumber, db$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Defensive Backs Approximate Value Per 16 vs Draft Position')
+abline(db_lm$coefficients[1], db_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(db_lm$coefficients[2], 3),'*Draft Position + ', round(db_lm$coefficients[1],3), '   R^2 = ', round(summary(db_lm)$r.squared, 3))
+text(75, 12, adj=c(0,0), labels=lab)
+
+```
+
+So each of these can show how well draft position predicts future success, with the vertical lines essentially symbolic of each specific round.  Going by adjusted R^2, defense is generally predicted better than offense (if you're going by R^2, but not necessarily the case going by slope, and idk which one is better tbh), linebackers best!

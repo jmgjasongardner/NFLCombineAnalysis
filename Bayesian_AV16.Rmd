@@ -1,0 +1,462 @@
+---
+title: "Bayesian"
+output: pdf_document
+---
+
+Packages 
+```{r echo = TRUE}
+library(LearnBayes)
+```
+
+Initial Data Set for Predicting
+```{r echo = TRUE}
+prosp <- read.csv('Prospects2020.csv')
+```
+
+Running Backs Bayesian Inference 
+```{r echo = TRUE}
+# Data Formatting 
+rb <- read.csv("RBs.csv")
+rb.full <- rb[is.na(rb$Forty) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$ThreeCone) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$Shuttle) == FALSE, ]
+
+prosp_rb <- subset(prosp, Position == "RB")
+prosp_rb_full <- prosp_rb[is.na(prosp_rb$Forty) == FALSE, ]
+prosp_rb_full <- prosp_rb_full[is.na(prosp_rb_full$ThreeCone) == FALSE, ]
+prosp_rb_full <- prosp_rb_full[is.na(prosp_rb_full$Shuttle) == FALSE, ]
+future <- as.data.frame(cbind(prosp_rb_full$Forty, prosp_rb_full$ThreeCone, prosp_rb_full$Shuttle))
+names(future) <- c("Forty", "Cone", "Shuttle")
+
+# Initial Regression
+rblm2 <- lm(AV16 ~  Forty + ThreeCone + Shuttle, data = rb.full)
+summary(rblm2)
+rb_bay <- as.data.frame(cbind(rb.full$AV16, rb.full$Forty, rb.full$ThreeCone, rb.full$Shuttle))
+names(rb_bay) <- c("AV16", "Forty", "Cone", "Shuttle")
+
+# Bayesian Inference
+fit = lm(AV16 ~ Forty + Cone + Shuttle, data = rb_bay)
+summary(fit)
+
+y = rb_bay$AV16
+n = length(y)
+x = as.matrix(cbind(rep(1,n), rb_bay[,2:4]))
+
+  ## Compute quantities for speed
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC settings
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  
+  ## Draw sigma2
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  
+  ## Draw beta
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "40 YD Dash", xlab = expression(beta[1]))
+hist(beta[,3], main = "3 Cone Drill", xlab = expression(beta[2]))
+hist(beta[,4], main = "Shuttle", xlab = expression(beta[3]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Forty = future[,1],
+                 Cone = future[,2],
+                 Shuttle = future[,3])
+
+# Predicting
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,10),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975))))
+```
+
+Quarterbacks Bayesian Inference 
+```{r echo = TRUE}
+# Data Formatting 
+qb <- read.csv("QBs.csv")
+qb.full <- qb[is.na(qb$Broad) == FALSE, ]
+qb.full <- qb.full[is.na(qb.full$Vert) == FALSE, ]
+
+prosp_qb <- subset(prosp, Position == "QB")
+prosp_qb_full <- prosp_qb[is.na(prosp_qb$Broad) == FALSE, ]
+prosp_qb_full <- prosp_qb_full[is.na(prosp_qb_full$Vert) == FALSE, ]
+future <- as.data.frame(cbind(prosp_qb_full$Broad, prosp_qb_full$Vert))
+names(future) <- c("Broad", "Vert")
+
+# Initial Regression 
+qblm2 <- lm(AV16 ~  Broad + Vert, data = qb.full)
+summary(qblm2)
+qb_bay <- as.data.frame(cbind(qb.full$AV16, qb.full$Broad, qb.full$Vert))
+names(qb_bay) <- c("AV16", "Broad", "Vert")
+
+# Bayesian Inference
+fit = lm(AV16 ~ Broad + Vert, data = qb_bay)
+summary(fit)
+
+y = qb_bay$AV16
+n = length(y)
+x = as.matrix(cbind(rep(1,n), qb_bay[,2:3]))
+
+  ## Compute quantities for speed
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC settings
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  
+  ## Draw sigma2
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  
+  ## Draw beta
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "Broad Jump", xlab = expression(beta[1]))
+hist(beta[,3], main = "Vertical", xlab = expression(beta[2]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Broad = future[,1],
+                 Vert = future[,2])
+
+# Predicting
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,13),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975))))
+```
+
+Linebackers Bayesian Inference 
+```{r echo = TRUE}
+# Data Formatting 
+lb <- read.csv("LBs.csv")
+lb.full <- lb[is.na(lb$Weight) == FALSE, ]
+lb.full <- lb.full[is.na(lb.full$Broad) == FALSE, ]
+lb.full <- lb.full[is.na(lb.full$ThreeCone) == FALSE, ]
+
+prosp_lb <- subset(prosp, Position == "LB")
+prosp_lb_full <- prosp_lb[is.na(prosp_lb$Weight) == FALSE, ]
+prosp_lb_full <- prosp_lb_full[is.na(prosp_lb_full$Broad) == FALSE, ]
+prosp_lb_full <- prosp_lb_full[is.na(prosp_lb_full$ThreeCone) == FALSE, ]
+future <- as.data.frame(cbind(prosp_lb_full$Weight, prosp_lb_full$Broad, prosp_lb_full$ThreeCone))
+names(future) <- c("Weight", "Broad", "Cone")
+
+# Initial Regression 
+lblm2 <- lm(AV16 ~ Weight + Broad + ThreeCone, data = lb.full)
+summary(lblm2)
+lb_bay <- as.data.frame(cbind(lb.full$AV16, lb.full$Weight, lb.full$Broad, lb.full$ThreeCone))
+names(lb_bay) <- c("AV16", "Weight", "Broad", "ThreeCone")
+
+# Bayesian Inference
+fit = lm(AV16 ~ Weight + Broad + ThreeCone, data = lb_bay)
+summary(fit)
+
+y = lb_bay$AV16
+n = length(y)
+x = as.matrix(cbind(rep(1,n), lb_bay[,2:4]))
+
+  ## Compute quantities for speed
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC settings
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  
+  ## Draw sigma2
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  
+  ## Draw beta
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "Weight", xlab = expression(beta[1]))
+hist(beta[,3], main = "Broad", xlab = expression(beta[2]))
+hist(beta[,4], main = "Three Cone", xlab = expression(beta[3]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Weight = future[,1],
+                 Broad = future[,2],
+                 ThreeCone = future[,3])
+
+# Predicting
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,11),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975))))
+```
+
+Defensive Backs Bayesian Inference 
+```{r echo = TRUE}
+# Data Formatting
+db <- read.csv("DBs.csv")
+db.full <- db[is.na(db$Forty) == FALSE, ]
+db.full <- db.full[is.na(db.full$Broad) == FALSE, ]
+db.full <- db.full[is.na(db.full$Weight) == FALSE, ]
+
+prosp_db <- subset(prosp, Position == "DB")
+prosp_db_full <- prosp_db[is.na(prosp_db$Forty) == FALSE, ]
+prosp_db_full <- prosp_db_full[is.na(prosp_db_full$Broad) == FALSE, ]
+prosp_db_full <- prosp_db_full[is.na(prosp_db_full$Weight) == FALSE, ]
+future <- as.data.frame(cbind(prosp_db_full$Forty, prosp_db_full$Broad, prosp_db_full$Weight))
+names(future) <- c("Forty", "Broad", "Weight")
+
+# Initial Regression 
+dblm2 <- lm(AV16 ~  Forty + Weight + Broad, data = db.full)
+summary(dblm2)
+db_bay <- as.data.frame(cbind(db.full$AV16, db.full$Forty, db.full$Weight, db.full$Broad))
+names(db_bay) <- c("AV16", "Forty", "Weight", "Broad")
+
+# Bayesian Inference 
+fit = lm(AV16 ~ Forty + Weight + Broad, data = db_bay)
+summary(fit)
+
+y = db_bay$AV16
+n = length(y)
+x = as.matrix(cbind(rep(1,n), db_bay[,2:4]))
+
+  ## Compute quantities for speed
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC settings
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  
+  ## Draw sigma2
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  
+  ## Draw beta
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "Forty", xlab = expression(beta[1]))
+hist(beta[,3], main = "Weight", xlab = expression(beta[2]))
+hist(beta[,4], main = "Broad", xlab = expression(beta[3]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Forty = future[,1],
+                 Weight = future[,2],
+                 Broad = future[,3])
+
+# Predictring
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,21),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975))))
+```
+
+Tight Ends Bayesian Inference 
+```{r echo = TRUE}
+# Data Formatting
+te <- read.csv("TEs.csv")
+te.full <- te[is.na(te$Forty) == FALSE, ]
+
+prosp_te <- subset(prosp, Position == "TE")
+prosp_te_full <- prosp_te[is.na(prosp_te$Forty) == FALSE, ]
+future <- as.data.frame(prosp_te_full$Forty)
+names(future) <- c("Forty")
+
+# Initial Regression
+telm2 <- lm(AV16 ~ Forty, data = te.full)
+summary(telm2)
+te_bay <- as.data.frame(cbind(te.full$AV16, te.full$Forty))
+names(te_bay) <- c("AV16", "Forty")
+
+# Bayesian Inference
+fit = lm(AV16 ~ Forty, data = te_bay)
+summary(fit)
+
+y = te_bay$AV16
+n = length(y)
+x = as.matrix(cbind(rep(1,n), te_bay[,2]))
+
+  ## Compute quantities for speed
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC settings
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  
+  ## Draw sigma2
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  
+  ## Draw beta
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "Forty", xlab = expression(beta[1]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Forty = future[,1])
+
+# Predicting
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,17),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975))))
+```

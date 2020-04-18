@@ -1,3 +1,6 @@
+tinyurl.com/NFLCombineAnalysis2020 -- Editable link for us
+tinyurl.com/NFLCombineAnalysisPresentation -- Share link for anyone to view
+
 Inspiration for project
 What is a combine?
 	Stuff from other papers

@@ -16,7 +16,7 @@ library(dplyr)
 
 ```{r}
 curr <- read.csv('DataUpdate3.csv')
-prosp <- read.csv('Prospects2020.csv')
+prosp <- read.csv('Prospects2020_2.csv')
 dim(curr)
 dim(prosp)
 head(curr)
@@ -29,6 +29,7 @@ curr <- curr %>%
   filter (Games >= 8) %>%
   arrange(-AV16, Name)
 #write.csv(curr, 'DataUpdate4.csv')
+curr <- read.csv('DataUpdate4.csv')
 
 qb <- filter(curr, Position == 'QB')
 #write.csv(qb, 'QBs.csv')

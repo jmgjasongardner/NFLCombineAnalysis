@@ -1,5 +1,23 @@
-# Load in packages
+---
+title: "Linear Modeling: Training and Test Sets and RMSE"
+author: "Jason Gardner"
+date: "April 20, 2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
 library(MASS)
+library(dplyr)
+library(caTools) # Test and training split
+library(hydroGOF) # RMSE calculation
+```
+
+```{r}
 
 ########## Regression on AV16 ##########
 ##-----------------------------
@@ -253,4 +271,221 @@ summary(dblm3)
 # Variable selection
 summary(stepAIC(object = dblm3, direction = c("backward")))
 # sig = 40yd, 3cone, broad
+```
+
+```{r}
+n = 500
+AVval = c()
+PNval = c()
+size = c()
+
+
+rmseAVtot <- 0
+rmsePNtot <- 0
+for (i in 1:n){
+  sample <- sample.split(qb.full$AV16, SplitRatio = 0.75) # Splitting data into 75% train and 25% test
+  train_set <- subset(qb.full, sample == TRUE)
+  test_set <- subset(qb.full, sample == FALSE)
+  qblm2 <- lm(AV16 ~ Height + Weight + Forty + Broad + Vert + Shuttle + Wonderlic, 
+            data = train_set)
+  qblm3 <- lm(PickNumber ~ Height + Weight + Forty + Broad + Vert + Shuttle + Wonderlic, 
+            data = train_set)
+  pred <- predict(qblm2, test_set)
+  rmseAV <- rmse(pred, test_set$AV16)
+  pred <- predict(qblm3, test_set)
+  rmsePN <- rmse(pred, test_set$PickNumber)
+  rmseAVtot <- rmseAVtot + rmseAV
+  rmsePNtot <- rmsePNtot + rmsePN
+  i = i + 1
+}
+AVval = c(AVval, rmseAVtot/n)
+PNval = c(PNval, rmsePNtot/n)
+size = c(size, nrow(qb.full))
+
+
+rmseAVtot <- 0
+rmsePNtot <- 0
+for (i in 1:n){
+  sample <- sample.split(rb.full$AV16, SplitRatio = 0.75) # Splitting data into 75% train and 25% test
+  train_set <- subset(rb.full, sample == TRUE)
+  test_set <- subset(rb.full, sample == FALSE)
+  rblm2 <- lm(AV16 ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = train_set)
+  rblm3 <- lm(PickNumber ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = train_set)
+  pred <- predict(rblm2, test_set)
+  rmseAV <- rmse(pred, test_set$AV16)
+  pred <- predict(rblm3, test_set)
+  rmsePN <- rmse(pred, test_set$PickNumber)
+  rmseAVtot <- rmseAVtot + rmseAV
+  rmsePNtot <- rmsePNtot + rmsePN
+  i = i + 1
+}
+AVval = c(AVval, rmseAVtot/n)
+PNval = c(PNval, rmsePNtot/n)
+size = c(size, nrow(rb.full))
+
+
+rmseAVtot <- 0
+rmsePNtot <- 0
+for (i in 1:n){
+  sample <- sample.split(wr.full$AV16, SplitRatio = 0.75) # Splitting data into 75% train and 25% test
+  train_set <- subset(wr.full, sample == TRUE)
+  test_set <- subset(wr.full, sample == FALSE)
+  wrlm2 <- lm(AV16 ~ Forty + ThreeCone + Broad, 
+            data = train_set)
+  wrlm3 <- lm(PickNumber ~ Forty + ThreeCone + Broad, 
+            data = train_set)
+  pred <- predict(wrlm2, test_set)
+  rmseAV <- rmse(pred, test_set$AV16)
+  pred <- predict(wrlm3, test_set)
+  rmsePN <- rmse(pred, test_set$PickNumber)
+  rmseAVtot <- rmseAVtot + rmseAV
+  rmsePNtot <- rmsePNtot + rmsePN
+  i = i + 1
+}
+AVval = c(AVval, rmseAVtot/n)
+PNval = c(PNval, rmsePNtot/n)
+size = c(size, nrow(wr.full))
+
+
+rmseAVtot <- 0
+rmsePNtot <- 0
+for (i in 1:n){
+  sample <- sample.split(te.full$AV16, SplitRatio = 0.75) # Splitting data into 75% train and 25% test
+  train_set <- subset(te.full, sample == TRUE)
+  test_set <- subset(te.full, sample == FALSE)
+  telm2 <- lm(AV16 ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = train_set)
+  telm3 <- lm(PickNumber ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = train_set)
+  pred <- predict(telm2, test_set)
+  rmseAV <- rmse(pred, test_set$AV16)
+  pred <- predict(telm3, test_set)
+  rmsePN <- rmse(pred, test_set$PickNumber)
+  rmseAVtot <- rmseAVtot + rmseAV
+  rmsePNtot <- rmsePNtot + rmsePN
+  i = i + 1
+}
+AVval = c(AVval, rmseAVtot/n)
+PNval = c(PNval, rmsePNtot/n)
+size = c(size, nrow(te.full))
+
+
+rmseAVtot <- 0
+rmsePNtot <- 0
+for (i in 1:n){
+  sample <- sample.split(ol.full$AV16, SplitRatio = 0.75) # Splitting data into 75% train and 25% test
+  train_set <- subset(ol.full, sample == TRUE)
+  test_set <- subset(ol.full, sample == FALSE)
+  ollm2 <- lm(AV16 ~ Height + Weight + Forty + Broad + Bench + ThreeCone, 
+            data = train_set)
+  ollm3 <- lm(PickNumber ~ Height + Weight + Forty + Broad + Bench + ThreeCone, 
+            data = train_set)
+  pred <- predict(ollm2, test_set)
+  rmseAV <- rmse(pred, test_set$AV16)
+  pred <- predict(ollm3, test_set)
+  rmsePN <- rmse(pred, test_set$PickNumber)
+  rmseAVtot <- rmseAVtot + rmseAV
+  rmsePNtot <- rmsePNtot + rmsePN
+  i = i + 1
+}
+AVval = c(AVval, rmseAVtot/n)
+PNval = c(PNval, rmsePNtot/n)
+size = c(size, nrow(ol.full))
+
+
+rmseAVtot <- 0
+rmsePNtot <- 0
+for (i in 1:n){
+  sample <- sample.split(dl.full$AV16, SplitRatio = 0.75) # Splitting data into 75% train and 25% test
+  train_set <- subset(dl.full, sample == TRUE)
+  test_set <- subset(dl.full, sample == FALSE)
+  dllm2 <- lm(AV16 ~ Weight + Forty + ThreeCone + Broad + Height, 
+            data = train_set)
+  dllm3 <- lm(PickNumber ~ Weight + Forty + ThreeCone + Broad + Height, 
+            data = train_set)
+  pred <- predict(dllm2, test_set)
+  rmseAV <- rmse(pred, test_set$AV16)
+  pred <- predict(dllm3, test_set)
+  rmsePN <- rmse(pred, test_set$PickNumber)
+  rmseAVtot <- rmseAVtot + rmseAV
+  rmsePNtot <- rmsePNtot + rmsePN
+  i = i + 1
+}
+AVval = c(AVval, rmseAVtot/n)
+PNval = c(PNval, rmsePNtot/n)
+size = c(size, nrow(dl.full))
+
+
+rmseAVtot <- 0
+rmsePNtot <- 0
+for (i in 1:n){
+  sample <- sample.split(lb.full$AV16, SplitRatio = 0.75) # Splitting data into 75% train and 25% test
+  train_set <- subset(lb.full, sample == TRUE)
+  test_set <- subset(lb.full, sample == FALSE)
+  lblm2 <- lm(AV16 ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = train_set)
+  lblm3 <- lm(PickNumber ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = train_set)
+  pred <- predict(lblm2, test_set)
+  rmseAV <- rmse(pred, test_set$AV16)
+  pred <- predict(lblm3, test_set)
+  rmsePN <- rmse(pred, test_set$PickNumber)
+  rmseAVtot <- rmseAVtot + rmseAV
+  rmsePNtot <- rmsePNtot + rmsePN
+  i = i + 1
+}
+AVval = c(AVval, rmseAVtot/n)
+PNval = c(PNval, rmsePNtot/n)
+size = c(size, nrow(lb.full))
+
+
+rmseAVtot <- 0
+rmsePNtot <- 0
+for (i in 1:n){
+  sample <- sample.split(db.full$AV16, SplitRatio = 0.75) # Splitting data into 75% train and 25% test
+  train_set <- subset(db.full, sample == TRUE)
+  test_set <- subset(db.full, sample == FALSE)
+  dblm2 <- lm(AV16 ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = train_set)
+  dblm3 <- lm(PickNumber ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = train_set)
+  pred <- predict(dblm2, test_set)
+  rmseAV <- rmse(pred, test_set$AV16)
+  pred <- predict(dblm3, test_set)
+  rmsePN <- rmse(pred, test_set$PickNumber)
+  rmseAVtot <- rmseAVtot + rmseAV
+  rmsePNtot <- rmsePNtot + rmsePN
+  i = i + 1
+}
+AVval = c(AVval, rmseAVtot/n)
+PNval = c(PNval, rmsePNtot/n)
+size = c(size, nrow(db.full))
+
+AVval = round(AVval, 3)
+PNval = round(PNval, 3)
+
+positions = c('QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'DB')
+
+rmse_df = data.frame(cbind(positions, size, PNval, AVval))
+names(rmse_df) = c('Position', 'NumberOfPlayers', 'RMSEofPickNumber', 'RMSEofAV16')
+
+
+curr <- read.csv('DataUpdate4.csv')
+sdPN <- sd(curr$PickNumber)
+sdAV <- sd(curr$AV16)
+
+
+rmse_norm_df <- rmse_df %>%
+  mutate(PickNumbRMSENorm = round(as.double(RMSEofPickNumber)/sdPN, 3)) %>%
+  mutate(AV16RMSENorm = round(as.double(RMSEofAV16)/sdAV, 3))
+
+rmse_norm_df['RMSEofPickNumber']<- NULL
+rmse_norm_df['RMSEofAV16'] <- NULL
+
+rmse_df
+rmse_norm_df
+  
+```
 

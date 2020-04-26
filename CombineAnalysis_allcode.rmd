@@ -1,0 +1,1720 @@
+---
+title: "CombineAnalysis_allcode"
+author: "Caleigh Page, Jason Gardner, Elijah Lipkin"
+date: "4/25/19"
+output: pdf_document
+---
+
+## Libraries 
+```{r echo = TRUE, eval = FALSE}
+library(XML)
+library(RCurl)
+library(stringr)
+library(dplyr)
+library(plyr)
+library(tidyr)
+library(MASS)
+library(LearnBayes)
+```
+
+## Datasets and Scraping 
+
+### Scraping Combine Dataset 
+```{r echo = TRUE, eval = FALSE}
+combine <- read.csv('DataOriginal.csv')
+
+pb_df <- data.frame(matrix(ncol = 2, nrow = 1))
+ap_df <- data.frame(matrix(ncol = 2, nrow = 1))
+colnames(pb_df) <- c('Pos', 'Player')
+colnames(ap_df) <- c('Pos', 'Player')
+
+for (year in 1987:2019){
+    #u <- paste0("https://www.pro-football-reference.com/players/", combine$url[i])
+    u <- paste0("https://www.pro-football-reference.com/years/", year, "/probowl.htm")
+    y <- paste0("https://www.pro-football-reference.com/years/", year, "/allpro.htm")
+    download.file(u, destfile = paste0("probowlers.html"))
+    download.file(y, destfile = paste0("allpros.html"))
+    pb <- htmlParse("probowlers.html")
+    ap <- htmlParse("allpros.html")    
+    pb_tab <- readHTMLTable(pb)
+    pb_tab <- pb_tab[[1]]
+    pb_tab <- pb_tab[,1:2]
+    ap_tab <- readHTMLTable(ap)
+    ap_tab <- ap_tab[[1]]
+    ap_tab <- ap_tab[,1:2]
+    pb_tab$Pos = as.character(pb_tab$Pos)
+    pb_tab$Player = as.character(pb_tab$Player)
+    ap_tab$Pos = as.character(ap_tab$Pos)
+    ap_tab$Player = as.character(ap_tab$Player)
+    pb_df = rbind(pb_df, pb_tab)
+    ap_df = rbind(ap_df, ap_tab)
+    free(pb)
+    free(ap)
+}
+pb_df = pb_df[2:nrow(pb_df),]
+ap_df = ap_df[2:nrow(ap_df),]
+for (i in 1:nrow(pb_df)){
+  pb_df$Player[i]=str_remove(pb_df$Player[i], '%')
+  pb_df$Player[i]=str_remove(pb_df$Player[i], "[+]")
+}
+for (i in 1:nrow(ap_df)){
+  ap_df$Player[i]=str_remove(ap_df$Player[i], '%')
+  ap_df$Player[i]=str_remove(ap_df$Player[i], "[+]")
+}
+
+pb_df <- pb_df %>%
+  count(vars=c('Pos', 'Player')) %>%
+  rename(replace = c('freq' = 'ProBowls')) %>%
+  rename(replace = c('Player' = 'Name'))
+combine = left_join(combine, pb_df, by=c('Name','POS'='Pos'))
+
+ap_df <- ap_df %>%
+  count(vars=c('Pos', 'Player')) %>%
+  rename(replace = c('freq' = 'AllPros')) %>%
+  rename(replace = c('Player' = 'Name'))
+combine = left_join(combine, ap_df, by=c('Name','POS'='Pos'))
+names(combine) = c('Year', 'Name', 'College', 'Position', 'Height', 'Weight', 'Wonderlic', '40YD', 'Bench', 'Vert', 'Broad', 'Shuttle', '3Cone', 'ProBowls', 'AllPros')
+
+# only uncomment below if necessary
+# write.csv(combine, 'DataUpdate1.csv', row.names = FALSE)
+```
+
+### First Attempt at Creating a Success Metric (did not end up being used)
+```{r echo = TRUE, eval = FALSE}
+dat <- read.csv('DataUpdate1.csv')
+
+have_played <- dat %>%
+  filter(Year != 2020)
+for (i in 1:nrow(have_played)){
+  if (is.na(have_played$ProBowls[i])){
+    have_played$ProBowls[i]=0
+  }
+  if (is.na(have_played$AllPros[i])){
+    have_played$AllPros[i]=0
+  }
+}
+have_played <- have_played %>% 
+  mutate(Success = ProBowls + 2*AllPros) %>% # Can be arbitrary
+  arrange(desc(Success))
+
+# Only uncomment below if necessary
+# write.csv (have_played, 'havePlayed.csv')
+```
+
+### Scraping Approximate Value Metric (metric used in project)
+```{r echo = TRUE, eval = FALSE}
+draft_picks <- read.csv("https://raw.githubusercontent.com/leesharpe/nfldata/master/data/draft_picks.csv")
+draft_picks <- draft_picks %>% 
+  filter(str_length(playerid)>2)
+draft_picks$playerid <- as.character(draft_picks$playerid)
+
+position <- as.character(unique(draft_picks$position))
+aval <- data.frame(matrix(ncol = 1)) 
+aval <- aval %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>%
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="receiving_and_rushing"]/tfoot/tr[1]/td[30]') %>% 
+  rbind('//*[@id="rushing_and_receiving"]/tfoot/tr/td[30]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="receiving_and_rushing"]/tfoot/tr[1]/td[30]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="kicking"]/tfoot/tr[1]/td[33]') %>% 
+  rbind('//*[@id="passing"]/tfoot/tr[1]/td[30]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="receiving_and_rushing"]/tfoot/tr/td[30]') %>% 
+  rbind('//*[@id="kicking"]/tfoot/tr/td[33]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]') %>% 
+  rbind('//*[@id="defense"]/tfoot/tr[1]/td[23]')
+aval <- aval[-1,]
+positions <- data.frame(cbind(position, aval))
+
+gms=c()
+for (i in 1:nrow(positions)){
+  gm = substr(positions$aval[i], 1, str_length(positions$aval[i])-3)
+  gm = paste0(gm, '4]')
+  gms=c(gms,gm)
+}
+positions$gms <- gms
+
+draft_picks <- left_join(draft_picks, positions)
+draft_picks <- draft_picks[-c(192, 793, 1937, 1975, 2876, 3062, 3673, 4005, 4508),]
+
+urls <- draft_picks$playerid
+gms <- draft_picks$gms
+aval <- draft_picks$aval
+
+for (i in 1:nrow(draft_picks)) {
+  # get the appopriate url address
+  u <- paste0("https://www.pro-football-reference.com/players/",substr(urls[i],1,1),"/",urls[i],".htm")
+  if (url.exists(url = u)) {
+    download.file(u, destfile = paste0("approxval.html"))
+    doc <- htmlParse("approxval.html")
+    g <- getNodeSet(doc, gms[i])
+    g <- as.numeric(xmlValue(g[[1]]))
+    av <- getNodeSet(doc, aval[i])
+    av <- tryCatch({as.numeric(xmlValue(av[[1]]))}, error = function(e) {av <- NA})
+    urls_df[i, ] <- c(urls[i], g, av)
+    free(doc)
+    print(i)
+  }
+}
+
+good <- subset(urls_df, (!is.na(urls_df[,2]) & !is.na(urls_df[,3])))
+names(good) <- c('playerid', 'Games', 'AverageValue')
+draft_picks <- subset(draft_picks, playerid %in% good$playerid)
+draft_picks <- left_join(draft_picks, good, by='playerid')
+draft_picks$AverageValue <- as.numeric(draft_picks$AverageValue)
+draft_picks$Games <- as.numeric(draft_picks$Games)
+draft_picks <- draft_picks %>%
+  mutate(AVPer16 = AverageValue*16 / Games) %>%
+  arrange(-AVPer16)
+write.csv(draft_picks, 'AVplayers.csv')
+```
+
+### Joining and Updating Datasets 
+```{r echo = TRUE, eval = FALSE}
+## Load in data sets
+AVPlayers <- read.csv("AVPlayers.csv")
+DataUpdate1 <- read.csv("DataUpdate1.csv")
+
+## Change to character for manipulation
+DataUpdate1$Position <- as.character(DataUpdate1$Position)
+AVPlayers$position <- as.character(AVPlayers$position)
+
+## Standardize names for join
+AVPlayers$Name <- AVPlayers$full_name
+AVPlayers$Position <- AVPlayers$position
+
+## Remove unnecessary data
+AVPlayers <- AVPlayers[, -c(1, 7, 8, 12, 13)]
+
+## Make data look nicer 
+colnames(DataUpdate1) <- c("Season", "Name", "College", "Position", "Height",
+                           "Weight", "Wonderlic", "40 YD", "Bench", "Vert", "Broad",
+                           "Shuttle", "3Cone", "Pro Bowls", "All Pros")
+colnames(AVPlayers) <- c("Draft Year", "Team", "Draft Round", "Pick Number", "PlayerID",
+                         "Side", "Category", "position", "Games", "Avg Value", "AV16",
+                         "Name", "Position")
+
+## Standardize position naming
+for(val in 1:length(DataUpdate1$Position)) {
+  if(DataUpdate1$Position[val] == "OT") {
+    DataUpdate1$Position[val] <- "OL"
+  }
+  if(DataUpdate1$Position[val] == "OG") {
+    DataUpdate1$Position[val] <- "OL"
+  }
+  if(DataUpdate1$Position[val] == "C") {
+    DataUpdate1$Position[val] <- "OL"
+  }
+  if(DataUpdate1$Position[val] == "ILB") {
+    DataUpdate1$Position[val] <- "LB"
+  }
+  if(DataUpdate1$Position[val] == "OLB") {
+    DataUpdate1$Position[val] <- "LB"
+  }
+  if(DataUpdate1$Position[val] == "FS") {
+    DataUpdate1$Position[val] <- "DB"
+  }
+  if(DataUpdate1$Position[val] == "SS") {
+    DataUpdate1$Position[val] <- "DB"
+  }
+  if(DataUpdate1$Position[val] == "CB") {
+    DataUpdate1$Position[val] <- "DB"
+  }
+  if(DataUpdate1$Position[val] == "DE") {
+    DataUpdate1$Position[val] <- "DL"
+  }
+  if(DataUpdate1$Position[val] == "DT") {
+    DataUpdate1$Position[val] <- "DL"
+  }
+}
+
+for(val in 1:length(AVPlayers$Position)) {
+  if(AVPlayers$Position[val] == "OLB") {
+    AVPlayers$Position[val] <- "LB"
+  }
+  if(AVPlayers$Position[val] == "ILB") {
+    AVPlayers$Position[val] <- "LB"
+  }
+  if(AVPlayers$Position[val] == "NT") {
+    AVPlayers$Position[val] <- "DL"
+  }
+  if(AVPlayers$Position[val] == "T") {
+    AVPlayers$Position[val] <- "OL"
+  }
+  if(AVPlayers$Position[val] == "G") {
+    AVPlayers$Position[val] <- "OL"
+  }
+  if(AVPlayers$Position[val] == "OLB") {
+    AVPlayers$Position[val] <- "LB"
+  }
+  if(AVPlayers$Position[val] == "DE") {
+    AVPlayers$Position[val] <- "DL"
+  }
+  if(AVPlayers$Position[val] == "DT") {
+    AVPlayers$Position[val] <- "DL"
+  }
+  if(AVPlayers$Position[val] == "CB") {
+    AVPlayers$Position[val] <- "DB"
+  }
+  if(AVPlayers$Position[val] == "FS") {
+    AVPlayers$Position[val] <- "DB"
+  }
+  if(AVPlayers$Position[val] == "SS") {
+    AVPlayers$Position[val] <- "DB"
+  }
+  if(AVPlayers$Position[val] == "S") {
+    AVPlayers$Position[val] <- "DB"
+  }
+  if(AVPlayers$Position[val] == "C") {
+    AVPlayers$Position[val] <- "OL"
+  }
+  if(AVPlayers$Position[val] == "OT") {
+    AVPlayers$Position[val] <- "OL"
+  }
+  if(AVPlayers$Position[val] == "LS") {
+    AVPlayers$Position[val] <- "OL"
+  }
+  if(AVPlayers$Position[val] == "FB") {
+    AVPlayers$Position[val] <- "RB"
+  }
+}
+
+## Check to make sure positions are correct; AVPlayers has K and P, otherwise same
+# unique(DataUpdate1$Position)
+# unique(AVPlayers$Position)
+
+## Join!
+Data <- join(AVPlayers, DataUpdate1, by = c("Name", "Position"))
+
+## Remove dupe players and unnecessary columns
+Data <- Data[-c(56, 151, 248, 354, 416, 419, 477, 661, 663, 722, 916, 985, 
+                989:990, 1060, 1019, 1357, 1381, 1433, 1441, 1469, 1697, 1753, 
+                1771, 1803, 1810:1811, 1845, 1873, 1930, 2043, 2050, 2107, 2190, 
+                2455, 2540, 2562, 2604, 2621, 2721, 2768, 2782, 2800, 2897, 2916, 
+                3028, 3809, 3523, 3653, 3736, 3799), -c(6:8, 14)]
+
+## Create 2020 only set
+Data20 <- subset(DataUpdate1, Season == 2020)
+
+## Write
+write.csv(Data, "DataUpdate3.csv")
+write.csv(Data20, "Prospects2020.csv")
+```
+
+### Updating Prospects Dataset 
+```{r echo = TRUE, eval = FALSE}
+prospects <- read.csv("Prospects2020_2.csv")
+
+prospects$Position <- as.character(prospects$Position)
+
+for(val in 1:length(prospects$Position)) {
+  if(prospects$Position[val] == "LS") {
+    prospects$Position[val] <- "OL"
+  }
+  if(prospects$Position[val] == "S") {
+    prospects$Position[val] <- "DB"
+  }
+  if(prospects$Position[val] == "CB") {
+    prospects$Position[val] <- "DB"
+  }
+}
+
+unique(prospects$Position)
+
+write.csv(prospects, "Prospects2020_2.csv")
+```
+
+### Creating Datasets For Each Position
+```{r echo = TRUE, eval = FALSE}
+curr <- read.csv('DataUpdate3.csv')
+prosp <- read.csv('Prospects2020_2.csv')
+dim(curr)
+dim(prosp)
+head(curr)
+head(prosp)
+curr$X <- NULL
+curr <- curr %>% 
+  select(c(9:11, 1:8, everything())) %>%
+  rename(Forty = X40.YD,
+         ThreeCone = X3Cone) %>% 
+  filter (Games >= 8) %>%
+  arrange(-AV16, Name)
+write.csv(curr, 'DataUpdate4.csv')
+
+qb <- filter(curr, Position == 'QB')
+write.csv(qb, 'QBs.csv')
+rb <- filter(curr, Position == 'RB')
+write.csv(rb, 'RBs.csv')
+wr <- filter(curr, Position == 'WR')
+write.csv(wr, 'WRs.csv')
+te <- filter(curr, Position == 'TE')
+write.csv(te, 'TEs.csv')
+ol <- filter(curr, Position == 'OL')
+write.csv(ol, 'OLs.csv')
+kick <- filter(curr, Position == 'K')
+write.csv(kick, 'Kickers.csv')
+punt <- filter(curr, Position == 'P')
+write.csv(punt, 'Punters.csv')
+dl <- filter(curr, Position == 'DL')
+write.csv(dl, 'DLs.csv')
+lb <- filter(curr, Position == 'LB')
+write.csv(lb, 'LBs.csv')
+db <- filter(curr, Position == 'DB')
+write.csv(db, 'DBs.csv')
+```
+
+## Linear Regression
+
+### Regressions for NFL Success and Pick Number on Combine Results 
+```{r echo = TRUE}
+########## Regression on AV16 ##########
+##-----------------------------
+# Load in position CSV
+qb <- read.csv("QBs.csv")
+
+# Subset data to remove NA
+qb.full <- qb[is.na(qb$Forty) == FALSE, ]
+qb.full <- qb.full[is.na(qb.full$Weight) == FALSE, ]
+qb.full <- qb.full[is.na(qb.full$Height) == FALSE, ]
+qb.full <- qb.full[is.na(qb.full$Vert) == FALSE, ]
+qb.full <- qb.full[is.na(qb.full$Broad) == FALSE, ]
+qb.full <- qb.full[is.na(qb.full$Shuttle) == FALSE, ]
+qb.full <- qb.full[is.na(qb.full$Wonderlic) == FALSE, ]
+
+# Full linear model
+qblm2 <- lm(AV16 ~ Height + Weight + Forty + Broad + Vert + Shuttle + Wonderlic, 
+            data = qb.full)
+summary(qblm2)
+
+# Variable selection
+summary(stepAIC(object = qblm2, direction = c("backward")))
+# sig = broad, vertical 
+
+##-----------------------------
+# Load in position CSV
+rb <- read.csv("RBs.csv")
+
+# Subset data to remove NA
+rb.full <- rb[is.na(rb$Forty) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$Weight) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$Height) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$ThreeCone) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$Broad) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$Bench) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$Shuttle) == FALSE, ]
+
+# Full linear model
+rblm2 <- lm(AV16 ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = rb.full)
+summary(rblm2)
+
+# Variable selection
+summary(stepAIC(object = rblm2, direction = c("backward")))
+# sig = 40yd, 3cone, shuttle
+
+##-------------------------
+# Load in position CSV
+wr <- read.csv("WRs.csv")
+
+# Subset data to remove NA
+wr.full <- wr[is.na(wr$Forty) == FALSE, ]
+wr.full <- wr.full[is.na(wr.full$ThreeCone) == FALSE, ]
+wr.full <- wr.full[is.na(wr.full$Broad) == FALSE, ]
+
+# Full linear model
+wrlm2 <- lm(AV16 ~ Forty + ThreeCone + Broad, 
+            data = wr.full)
+summary(wrlm2)
+
+# Variable selection
+summary(stepAIC(object = wrlm2, direction = c("backward")))
+# nothing sig :(
+
+##-----------------------------
+# Load in position CSV
+te <- read.csv("tes.csv")
+
+# Subset data to remove NA
+te.full <- te[is.na(te$Forty) == FALSE, ]
+te.full <- te.full[is.na(te.full$Weight) == FALSE, ]
+te.full <- te.full[is.na(te.full$Height) == FALSE, ]
+te.full <- te.full[is.na(te.full$ThreeCone) == FALSE, ]
+te.full <- te.full[is.na(te.full$Broad) == FALSE, ]
+te.full <- te.full[is.na(te.full$Bench) == FALSE, ]
+te.full <- te.full[is.na(te.full$Shuttle) == FALSE, ]
+
+# Full linear model
+telm2 <- lm(AV16 ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = te.full)
+summary(telm2)
+
+# Variable selection
+summary(stepAIC(object = telm2, direction = c("backward")))
+# sig = 40yd
+
+##----------------------------
+# Load in position CSV
+ol <- read.csv("OLs.csv")
+
+# Subset data to remove NA
+ol.full <- ol[is.na(ol$Forty) == FALSE, ]
+ol.full <- ol.full[is.na(ol.full$Weight) == FALSE, ]
+ol.full <- ol.full[is.na(ol.full$Height) == FALSE, ]
+ol.full <- ol.full[is.na(ol.full$ThreeCone) == FALSE, ]
+ol.full <- ol.full[is.na(ol.full$Broad) == FALSE, ]
+ol.full <- ol.full[is.na(ol.full$Bench) == FALSE, ]
+
+# Full linear model
+ollm2 <- lm(AV16 ~ Height + Weight + Forty + Broad + Bench + ThreeCone, 
+            data = ol.full)
+summary(ollm2)
+
+# Variable selection
+summary(stepAIC(object = ollm2, direction = c("backward")))
+# sig = weight, 40yd
+
+##-----------------------------
+# Load in position CSV
+dl <- read.csv("dls.csv")
+
+# Subset data to remove NA
+dl.full <- dl[is.na(dl$Forty) == FALSE, ]
+dl.full <- dl.full[is.na(dl.full$Height) == FALSE, ]
+dl.full <- dl.full[is.na(dl.full$Weight) == FALSE, ]
+dl.full <- dl.full[is.na(dl.full$ThreeCone) == FALSE, ]
+dl.full <- dl.full[is.na(dl.full$Broad) == FALSE, ]
+
+# Full linear model
+dllm2 <- lm(AV16 ~ Weight + Forty + ThreeCone + Broad + Height, 
+            data = dl.full)
+summary(dllm2)
+
+# Variable selection
+summary(stepAIC(object = dllm2, direction = c("backward")))
+# sig = weight, 3cone, broad, forty (to 0.1)
+
+##-----------------------------
+# Load in position CSV
+lb <- read.csv("lbs.csv")
+
+# Subset data to remove NA
+lb.full <- lb[is.na(lb$Forty) == FALSE, ]
+lb.full <- lb.full[is.na(lb.full$Weight) == FALSE, ]
+lb.full <- lb.full[is.na(lb.full$Height) == FALSE, ]
+lb.full <- lb.full[is.na(lb.full$ThreeCone) == FALSE, ]
+lb.full <- lb.full[is.na(lb.full$Broad) == FALSE, ]
+lb.full <- lb.full[is.na(lb.full$Bench) == FALSE, ]
+lb.full <- lb.full[is.na(lb.full$Shuttle) == FALSE, ]
+
+# Full linear model
+lblm2 <- lm(AV16 ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = lb.full)
+summary(lblm2)
+
+# Variable selection
+summary(stepAIC(object = lblm2, direction = c("backward")))
+# sig = weight, broad, 3cone (to 0.1)
+
+##-----------------------------
+# Load in position CSV
+db <- read.csv("dbs.csv")
+
+# Subset data to remove NA
+db.full <- db[is.na(db$Forty) == FALSE, ]
+db.full <- db.full[is.na(db.full$Weight) == FALSE, ]
+db.full <- db.full[is.na(db.full$Height) == FALSE, ]
+db.full <- db.full[is.na(db.full$ThreeCone) == FALSE, ]
+db.full <- db.full[is.na(db.full$Broad) == FALSE, ]
+db.full <- db.full[is.na(db.full$Bench) == FALSE, ]
+db.full <- db.full[is.na(db.full$Shuttle) == FALSE, ]
+
+# Full linear model
+dblm2 <- lm(AV16 ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = db.full)
+summary(dblm2)
+
+# Variable selection
+summary(stepAIC(object = dblm2, direction = c("backward")))
+# sig = 40yd, weight, broad (to 0.1)
+
+
+
+########## Regression on Pick ##########
+##-----------------------------
+# Full linear model
+qblm3 <- lm(Pick.Number ~ Height + Weight + Forty + Broad + Vert + Shuttle + Wonderlic, 
+            data = qb.full)
+summary(qblm3)
+
+# Variable selection
+summary(stepAIC(object = qblm3, direction = c("backward")))
+# sig = broad 
+
+##-----------------------------
+# Full linear model
+rblm3 <- lm(Pick.Number ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = rb.full)
+summary(rblm3)
+
+# Variable selection
+summary(stepAIC(object = rblm3, direction = c("backward")))
+# sig = weight, 40yd, 3cone (to 0.1), broad (to 0.1)
+
+##-----------------------------
+# Full linear model
+wrlm3 <- lm(Pick.Number ~ Forty + ThreeCone + Broad, 
+            data = wr.full)
+summary(wrlm3)
+
+# Variable selection
+summary(stepAIC(object = wrlm3, direction = c("backward")))
+# sig = 40yd
+
+##-----------------------------
+# Full linear model
+telm3 <- lm(Pick.Number ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = te.full)
+summary(telm3)
+
+# Variable selection
+summary(stepAIC(object = telm3, direction = c("backward")))
+# sig = 40yd, bench
+
+##-----------------------------
+# Full linear model
+ollm3 <- lm(Pick.Number ~ Height + Weight + Forty + Broad + Bench + ThreeCone, 
+            data = ol.full)
+summary(ollm3)
+
+# Variable selection
+summary(stepAIC(object = ollm3, direction = c("backward")))
+# sig = height, weight, 40yd, bench
+
+##-----------------------------
+# Full linear model
+dllm3 <- lm(Pick.Number ~ Weight + Forty + ThreeCone + Broad + Height, 
+            data = dl.full)
+summary(dllm3)
+
+# Variable selection
+summary(stepAIC(object = dllm3, direction = c("backward")))
+# sig = weight, 40yd, 3cone (to 0.1), broad (to 0.1)
+
+##-----------------------------
+# Full linear model
+lblm3 <- lm(Pick.Number ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = lb.full)
+summary(lblm3)
+
+# Variable selection
+summary(stepAIC(object = lblm3, direction = c("backward")))
+# sig = weight, broad, 40yd, shuttle
+
+##-----------------------------
+# Full linear model
+dblm3 <- lm(Pick.Number ~ Height + Weight + Forty + ThreeCone + Broad + Bench + Shuttle, 
+            data = db.full)
+summary(dblm3)
+
+# Variable selection
+summary(stepAIC(object = dblm3, direction = c("backward")))
+# sig = 40yd, 3cone, broad
+```
+
+### Additional Graph for Presentation
+```{r echo = TRUE, eval = FALSE}
+curr <- read.csv("DataUpdate4.csv")
+ovr_lm <- lm(AV16 ~ Height + Weight + Wonderlic + Forty + Bench + Vert + Broad + Shuttle + ThreeCone, data=curr)
+summary(ovr_lm)
+plot(curr$AV16, curr$Wonderlic, col=curr$Position, xlab='Wonderlic Score', ylab='Career Approximate Value Per 16 Games', main='All Players Approximate Value Per 16 vs Wonderlic Score')
+abline(ovr_lm$coefficients[1], ovr_lm$coefficients[2], col='green')
+legend('topright', legend = levels(curr$Position), col = 1:10, cex = 0.8, pch = 1)
+lab=paste0('AVPer16 = ', round(ovr_lm$coefficients[2], 3),'*Wonderlic + ', round(ovr_lm$coefficients[1],3), '   R^2 = ', round(summary(ovr_lm)$r.squared, 3))
+text(-3, 45, adj=c(0,0), labels=lab)
+```
+
+
+
+### Regressions for NFL Success on Pick Number
+```{r echo = TRUE, eval = FALSE}
+ovr_lm <- lm(AV16 ~ PickNumber, data=curr)
+summary(ovr_lm)
+plot(curr$PickNumber, curr$AV16, col=curr$Position, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='All Players Approximate Value Per 16 vs Draft Position')
+abline(ovr_lm$coefficients[1], ovr_lm$coefficients[2], col='green')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+legend('topright', legend = levels(curr$Position), col = 1:10, cex = 0.8, pch = 1)
+lab=paste0('AVPer16 = ', round(ovr_lm$coefficients[2], 3),'*Draft Position + ', round(ovr_lm$coefficients[1],3), '   R^2 = ', round(summary(ovr_lm)$r.squared, 3))
+text(50, 18, adj=c(0,0), labels=lab)
+
+
+qb_lm <- lm(AV16 ~ PickNumber, data=qb)
+summary(qb_lm)
+plot(qb$PickNumber, qb$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Quarterbacks Approximate Value Per 16 vs Draft Position')
+abline(qb_lm$coefficients[1], qb_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(qb_lm$coefficients[2], 3),'*Draft Position + ', round(qb_lm$coefficients[1],3), '   R^2 = ', round(summary(qb_lm)$r.squared, 3))
+text(75, 18, adj=c(0,0), labels=lab)
+
+
+rb_lm <- lm(AV16 ~ PickNumber, data=rb)
+summary(rb_lm)
+plot(rb$PickNumber, rb$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Running Backs Approximate Value Per 16 vs Draft Position')
+abline(rb_lm$coefficients[1], rb_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(rb_lm$coefficients[2], 3),'*Draft Position + ', round(rb_lm$coefficients[1],3), '   R^2 = ', round(summary(rb_lm)$r.squared, 3))
+text(75, 14, adj=c(0,0), labels=lab)
+
+wr_lm <- lm(AV16 ~ PickNumber, data=wr)
+summary(wr_lm)
+plot(wr$PickNumber, wr$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Wide Receivers Approximate Value Per 16 vs Draft Position')
+abline(wr_lm$coefficients[1], wr_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(wr_lm$coefficients[2], 3),'*Draft Position + ', round(wr_lm$coefficients[1],3), '   R^2 = ', round(summary(wr_lm)$r.squared, 3))
+text(75, 14, adj=c(0,0), labels=lab)
+
+te_lm <- lm(AV16 ~ PickNumber, data=te)
+summary(te_lm)
+plot(te$PickNumber, te$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Tight Ends Approximate Value Per 16 vs Draft Position')
+abline(te_lm$coefficients[1], te_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(te_lm$coefficients[2], 3),'*Draft Position + ', round(te_lm$coefficients[1],3), '   R^2 = ', round(summary(te_lm)$r.squared, 3))
+text(75, 10, adj=c(0,0), labels=lab)
+
+ol_lm <- lm(AV16 ~ PickNumber, data=ol)
+summary(ol_lm)
+plot(ol$PickNumber, ol$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Offensive Linemen Approximate Value Per 16 vs Draft Position')
+abline(ol_lm$coefficients[1], ol_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(ol_lm$coefficients[2], 3),'*Draft Position + ', round(ol_lm$coefficients[1],3), '   R^2 = ', round(summary(ol_lm)$r.squared, 3))
+text(75, 12, adj=c(0,0), labels=lab)
+
+dl_lm <- lm(AV16 ~ PickNumber, data=dl)
+summary(dl_lm)
+plot(dl$PickNumber, dl$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Defensive Linemen Approximate Value Per 16 vs Draft Position')
+abline(dl_lm$coefficients[1], dl_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(dl_lm$coefficients[2], 3),'*Draft Position + ', round(dl_lm$coefficients[1],3), '   R^2 = ', round(summary(dl_lm)$r.squared, 3))
+text(75, 14, adj=c(0,0), labels=lab)
+
+lb_lm <- lm(AV16 ~ PickNumber, data=lb)
+summary(lb_lm)
+plot(lb$PickNumber, lb$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Linebackers Approximate Value Per 16 vs Draft Position')
+abline(lb_lm$coefficients[1], lb_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(lb_lm$coefficients[2], 3),'*Draft Position + ', round(lb_lm$coefficients[1],3), '   R^2 = ', round(summary(lb_lm)$r.squared, 3))
+text(75, 14, adj=c(0,0), labels=lab)
+
+db_lm <- lm(AV16 ~ PickNumber, data=db)
+summary(db_lm)
+plot(db$PickNumber, db$AV16, xlab='Draft Position (Rounds Separated by Verticals)', ylab='Career Approximate Value Per 16 Games', main='Defensive Backs Approximate Value Per 16 vs Draft Position')
+abline(db_lm$coefficients[1], db_lm$coefficients[2], col='red')
+abline(v=seq(32, 250, by=32), col=c('blue'))
+lab=paste0('AVPer16 = ', round(db_lm$coefficients[2], 3),'*Draft Position + ', round(db_lm$coefficients[1],3), '   R^2 = ', round(summary(db_lm)$r.squared, 3))
+text(75, 12, adj=c(0,0), labels=lab)
+```
+
+## Bayesian Inference and Predictions 
+
+### Approximate Value 
+```{r echo = TRUE, eval = FALSE}
+prosp <- read.csv('Prospects2020_2.csv')
+
+# Running Backs Bayesian Inference 
+
+## Data Formatting 
+rb <- read.csv("RBs.csv")
+rb.full <- rb[is.na(rb$Forty) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$ThreeCone) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$Shuttle) == FALSE, ]
+
+prosp_rb <- subset(prosp, Position == "RB")
+prosp_rb_full <- prosp_rb[is.na(prosp_rb$Forty) == FALSE, ]
+prosp_rb_full <- prosp_rb_full[is.na(prosp_rb_full$ThreeCone) == FALSE, ]
+prosp_rb_full <- prosp_rb_full[is.na(prosp_rb_full$Shuttle) == FALSE, ]
+future <- as.data.frame(cbind(prosp_rb_full$Forty, prosp_rb_full$ThreeCone, prosp_rb_full$Shuttle))
+names(future) <- c("Forty", "Cone", "Shuttle")
+
+# Initial Regression
+rblm2 <- lm(AV16 ~  Forty + ThreeCone + Shuttle, data = rb.full)
+summary(rblm2)
+rb_bay <- as.data.frame(cbind(rb.full$AV16, rb.full$Forty, rb.full$ThreeCone, rb.full$Shuttle))
+names(rb_bay) <- c("AV16", "Forty", "Cone", "Shuttle")
+
+# Bayesian Inference
+fit = lm(AV16 ~ Forty + Cone + Shuttle, data = rb_bay)
+summary(fit)
+
+y = rb_bay$AV16
+n = length(y)
+x = as.matrix(cbind(rep(1,n), rb_bay[,2:4]))
+
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC 
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "40 YD Dash", xlab = expression(beta[1]))
+hist(beta[,3], main = "3 Cone Drill", xlab = expression(beta[2]))
+hist(beta[,4], main = "Shuttle", xlab = expression(beta[3]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Forty = future[,1],
+                 Cone = future[,2],
+                 Shuttle = future[,3])
+
+# Predicting
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,8),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+prediction <- as.data.frame(cbind(apply(ytilde, 2, mean), 
+                                  t(apply(ytilde, 2, quantile, c(0.025, 0.975)))))
+colnames(prediction) <- c("AV16", "Lower", "Upper")
+
+plot(prosp_rb_full$Name, prediction$AV16)
+
+# Plotting
+names <- c("Jonathan Taylor", "J.J. Taylor", "Scottie Phillips", "Joshua Kelley", "Tony Jones",
+           "Brian Herrien", "DeeJay Dallas", "Eno Benjamin")
+matplot(rbind(1:8,1:8), apply(ytilde, 2, quantile, c(0.025, 0.975)),
+        type = "l", lty = 1, xlab = "", ylab = "AV16")
+title(main = "Predictive RB AV16 for 2020 Combine Participants")
+points(1:8, prediction$AV16, pch = 19)
+
+# Quarterbacks Bayesian Inference 
+
+# Data Formatting 
+qb <- read.csv("QBs.csv")
+qb.full <- qb[is.na(qb$Broad) == FALSE, ]
+qb.full <- qb.full[is.na(qb.full$Vert) == FALSE, ]
+
+prosp_qb <- subset(prosp, Position == "QB")
+prosp_qb_full <- prosp_qb[is.na(prosp_qb$Broad) == FALSE, ]
+prosp_qb_full <- prosp_qb_full[is.na(prosp_qb_full$Vert) == FALSE, ]
+future <- as.data.frame(cbind(prosp_qb_full$Broad, prosp_qb_full$Vert))
+names(future) <- c("Broad", "Vert")
+
+# Initial Regression 
+qblm2 <- lm(AV16 ~  Broad + Vert, data = qb.full)
+summary(qblm2)
+qb_bay <- as.data.frame(cbind(qb.full$AV16, qb.full$Broad, qb.full$Vert))
+names(qb_bay) <- c("AV16", "Broad", "Vert")
+
+# Bayesian Inference
+fit = lm(AV16 ~ Broad + Vert, data = qb_bay)
+summary(fit)
+
+y = qb_bay$AV16
+n = length(y)
+x = as.matrix(cbind(rep(1,n), qb_bay[,2:3]))
+
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "Broad Jump", xlab = expression(beta[1]))
+hist(beta[,3], main = "Vertical", xlab = expression(beta[2]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Broad = future[,1],
+                 Vert = future[,2])
+
+# Predicting
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,10),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+prediction <- as.data.frame(cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975)))))
+colnames(prediction) <- c("AV16", "Lower", "Upper")
+
+# Plotting 
+matplot(rbind(1:10,1:10), apply(ytilde, 2, quantile, c(0.025, 0.975)),
+        type = "l", lty = 1, xlab = "", ylab = "AV16")
+title(main = "Predictive QB AV16 for 2020 Combine Participants")
+points(1:10, prediction$AV16, pch = 19)
+
+# Linebackers Bayesian Inference 
+
+# Data Formatting 
+lb <- read.csv("LBs.csv")
+lb.full <- lb[is.na(lb$Weight) == FALSE, ]
+lb.full <- lb.full[is.na(lb.full$Broad) == FALSE, ]
+lb.full <- lb.full[is.na(lb.full$ThreeCone) == FALSE, ]
+
+prosp_lb <- subset(prosp, Position == "LB")
+prosp_lb_full <- prosp_lb[is.na(prosp_lb$Weight) == FALSE, ]
+prosp_lb_full <- prosp_lb_full[is.na(prosp_lb_full$Broad) == FALSE, ]
+prosp_lb_full <- prosp_lb_full[is.na(prosp_lb_full$ThreeCone) == FALSE, ]
+future <- as.data.frame(cbind(prosp_lb_full$Weight, prosp_lb_full$Broad, prosp_lb_full$ThreeCone))
+names(future) <- c("Weight", "Broad", "Cone")
+
+# Initial Regression 
+lblm2 <- lm(AV16 ~ Weight + Broad + ThreeCone, data = lb.full)
+summary(lblm2)
+lb_bay <- as.data.frame(cbind(lb.full$AV16, lb.full$Weight, lb.full$Broad, lb.full$ThreeCone))
+names(lb_bay) <- c("AV16", "Weight", "Broad", "ThreeCone")
+
+# Bayesian Inference
+fit = lm(AV16 ~ Weight + Broad + ThreeCone, data = lb_bay)
+summary(fit)
+
+y = lb_bay$AV16
+n = length(y)
+x = as.matrix(cbind(rep(1,n), lb_bay[,2:4]))
+
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "Weight", xlab = expression(beta[1]))
+hist(beta[,3], main = "Broad", xlab = expression(beta[2]))
+hist(beta[,4], main = "Three Cone", xlab = expression(beta[3]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Weight = future[,1],
+                 Broad = future[,2],
+                 ThreeCone = future[,3])
+
+# Predicting
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,16),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+prediction <- as.data.frame(cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975)))))
+colnames(prediction) <- c("AV16", "Lower", "Upper")
+
+# Plotting 
+matplot(rbind(1:16,1:16), apply(ytilde, 2, quantile, c(0.025, 0.975)),
+        type = "l", lty = 1, xlab = "", ylab = "AV16")
+title(main = "Predictive LB AV16 for 2020 Combine Participants")
+points(1:16, prediction$AV16, pch = 19)
+
+# Defensive Backs Bayesian Inference 
+
+# Data Formatting
+db <- read.csv("DBs.csv")
+db.full <- db[is.na(db$Forty) == FALSE, ]
+db.full <- db.full[is.na(db.full$Broad) == FALSE, ]
+db.full <- db.full[is.na(db.full$Weight) == FALSE, ]
+
+prosp_db <- subset(prosp, Position == "DB")
+prosp_db_full <- prosp_db[is.na(prosp_db$Forty) == FALSE, ]
+prosp_db_full <- prosp_db_full[is.na(prosp_db_full$Broad) == FALSE, ]
+prosp_db_full <- prosp_db_full[is.na(prosp_db_full$Weight) == FALSE, ]
+future <- as.data.frame(cbind(prosp_db_full$Forty, prosp_db_full$Broad, prosp_db_full$Weight))
+names(future) <- c("Forty", "Broad", "Weight")
+
+# Initial Regression 
+dblm2 <- lm(AV16 ~  Forty + Weight + Broad, data = db.full)
+summary(dblm2)
+db_bay <- as.data.frame(cbind(db.full$AV16, db.full$Forty, db.full$Weight, db.full$Broad))
+names(db_bay) <- c("AV16", "Forty", "Weight", "Broad")
+
+# Bayesian Inference 
+fit = lm(AV16 ~ Forty + Weight + Broad, data = db_bay)
+summary(fit)
+
+y = db_bay$AV16
+n = length(y)
+x = as.matrix(cbind(rep(1,n), db_bay[,2:4]))
+
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC 
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "Forty", xlab = expression(beta[1]))
+hist(beta[,3], main = "Weight", xlab = expression(beta[2]))
+hist(beta[,4], main = "Broad", xlab = expression(beta[3]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Forty = future[,1],
+                 Weight = future[,2],
+                 Broad = future[,3])
+
+# Predictring
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,34),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+prediction <- as.data.frame(cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975)))))
+colnames(prediction) <- c("AV16", "Lower", "Upper")
+
+# Plotting 
+matplot(rbind(1:34,1:34), apply(ytilde, 2, quantile, c(0.025, 0.975)),
+        type = "l", lty = 1, xlab = "", ylab = "AV16")
+title(main = "Predictive DB AV16 for 2020 Combine Participants")
+points(1:34, prediction$AV16, pch = 19)
+
+# Tight Ends Bayesian Inference 
+
+# Data Formatting
+te <- read.csv("TEs.csv")
+te.full <- te[is.na(te$Forty) == FALSE, ]
+
+prosp_te <- subset(prosp, Position == "TE")
+prosp_te_full <- prosp_te[is.na(prosp_te$Forty) == FALSE, ]
+future <- as.data.frame(prosp_te_full$Forty)
+names(future) <- c("Forty")
+
+# Initial Regression
+telm2 <- lm(AV16 ~ Forty, data = te.full)
+summary(telm2)
+te_bay <- as.data.frame(cbind(te.full$AV16, te.full$Forty))
+names(te_bay) <- c("AV16", "Forty")
+
+# Bayesian Inference
+fit = lm(AV16 ~ Forty, data = te_bay)
+summary(fit)
+
+y = te_bay$AV16
+n = length(y)
+x = as.matrix(cbind(rep(1,n), te_bay[,2]))
+
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC 
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "Forty", xlab = expression(beta[1]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Forty = future[,1])
+
+# Predicting
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,11),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+prediction <- as.data.frame(cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975)))))
+colnames(prediction) <- c("AV16", "Lower", "Upper")
+
+# Plotting 
+matplot(rbind(1:11,1:11), apply(ytilde, 2, quantile, c(0.025, 0.975)),
+        type = "l", lty = 1, xlab = "", ylab = "AV16")
+title(main = "Predictive TE AV16 for 2020 Combine Participants")
+points(1:11, prediction$AV16, pch = 19)
+```
+
+
+### Pick Number 
+```{r echo = TRUE, eval = FALSE}
+prosp <- read.csv('Prospects2020_2.csv')
+
+# Running Back Bayesian Inference
+
+# Data Formatting 
+rb <- read.csv("RBs.csv")
+rb.full <- rb[is.na(rb$Pick.Number) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$Weight) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$Forty) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$ThreeCone) == FALSE, ]
+rb.full <- rb.full[is.na(rb.full$Broad) == FALSE, ]
+
+prosp_rb <- subset(prosp, Position == "RB")
+prosp_rb_full <- prosp_rb[is.na(prosp_rb$Weight) == FALSE, ]
+prosp_rb_full <- prosp_rb_full[is.na(prosp_rb_full$Forty) == FALSE, ]
+prosp_rb_full <- prosp_rb_full[is.na(prosp_rb_full$ThreeCone) == FALSE, ]
+prosp_rb_full <- prosp_rb_full[is.na(prosp_rb_full$Broad) == FALSE, ]
+future <- as.data.frame(cbind(prosp_rb_full$Weight, prosp_rb_full$Forty, prosp_rb_full$ThreeCone,
+                              prosp_rb_full$Broad))
+names(future) <- c("Weight", "Forty", "ThreeCone","Broad")
+
+# Initial Regression
+rblm3 <- lm(Pick.Number ~ Weight + Forty + ThreeCone + Broad, data = rb.full)
+summary(rblm3)
+rb_bay <- as.data.frame(cbind(rb.full$Pick.Number, rb.full$Weight, rb.full$Forty, rb.full$ThreeCone,
+                              rb.full$Broad))
+names(rb_bay) <- c("Pick.Number", "Weight", "Forty", "ThreeCone", "Broad")
+
+# Bayesian Inference
+fit = lm(Pick.Number ~ Weight + Forty + ThreeCone + Broad, data = rb_bay)
+summary(fit)
+
+y = rb_bay$Pick.Number
+n = length(y)
+x = as.matrix(cbind(rep(1,n), rb_bay[,2:5]))
+
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC 
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "Weight", xlab = expression(beta[1]))
+hist(beta[,3], main = "40 Yd Dash", xlab = expression(beta[2]))
+hist(beta[,4], main = "Three Cone Drill", xlab = expression(beta[3]))
+hist(beta[,5], main = "Broad Jump", xlab = expression(beta[4]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Weight = future[,1],
+                 Forty = future[,2],
+                 ThreeCone = future[,3], 
+                 Broad = future[,4])
+
+# Predicting
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,9),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+prediction <- as.data.frame(cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975)))))
+colnames(prediction) <- c("PickNumber", "Lower", "Upper")
+
+# Plotting 
+matplot(rbind(1:9,1:9), apply(ytilde, 2, quantile, c(0.025, 0.975)),
+        type = "l", lty = 1, xlab = "", ylab = "Pick Number")
+title(main = "Predictive RB Pick Number for 2020 Combine Participants")
+points(1:9, prediction$PickNumber, pch = 19)
+
+# Quarterback Bayesian Inference 
+
+# Data Formatting 
+qb <- read.csv("QBs.csv")
+qb.full <- qb[is.na(qb$Broad) == FALSE, ]
+
+prosp_qb <- subset(prosp, Position == "QB")
+prosp_qb_full <- prosp_qb[is.na(prosp_qb$Broad) == FALSE, ]
+future <- as.data.frame(cbind(prosp_qb_full$Broad))
+names(future) <- c("Broad")
+
+# Initial Regression
+qblm3 <- lm(Pick.Number ~ Broad, data = qb.full)
+summary(qblm3)
+qb_bay <- as.data.frame(cbind(qb.full$Pick.Number, qb.full$Broad))
+names(qb_bay) <- c("Pick.Number", "Broad")
+
+# Bayesian Inference
+fit = lm(Pick.Number ~ Broad, data = qb_bay)
+summary(fit)
+
+y = qb_bay$Pick.Number
+n = length(y)
+x = as.matrix(cbind(rep(1,n), qb_bay[,2]))
+
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC 
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "Broad Jump", xlab = expression(beta[1]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Broad = future[,1])
+
+# Predicting
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,10),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+prediction <- as.data.frame(cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975)))))
+colnames(prediction) <- c("PickNumber", "Lower", "Upper")
+
+# Plotting 
+matplot(rbind(1:10,1:10), apply(ytilde, 2, quantile, c(0.025, 0.975)),
+        type = "l", lty = 1, xlab = "", ylab = "Pick Number")
+title(main = "Predictive QB Pick Number for 2020 Combine Participants")
+points(1:10, prediction$PickNumber, pch = 19)
+
+# Linebackers Bayesian Inference
+
+# Data Formatting 
+lb <- read.csv("LBs.csv")
+lb.full <- lb[is.na(lb$Weight) == FALSE, ]
+lb.full <- lb.full[is.na(lb.full$Broad) == FALSE, ]
+lb.full <- lb.full[is.na(lb.full$Forty) == FALSE, ]
+lb.full <- lb.full[is.na(lb.full$Shuttle) == FALSE, ]
+
+prosp_lb <- subset(prosp, Position == "LB")
+prosp_lb_full <- prosp_lb[is.na(prosp_lb$Weight) == FALSE, ]
+prosp_lb_full <- prosp_lb_full[is.na(prosp_lb_full$Broad) == FALSE, ]
+prosp_lb_full <- prosp_lb_full[is.na(prosp_lb_full$Forty) == FALSE, ]
+prosp_lb_full <- prosp_lb_full[is.na(prosp_lb_full$Shuttle) == FALSE, ]
+future <- as.data.frame(cbind(prosp_lb_full$Weight, prosp_lb_full$Broad, prosp_lb_full$Forty,
+                              prosp_lb_full$Shuttle))
+names(future) <- c("Weight", "Broad", "Forty", "Shuttle")
+
+lblm3 <- lm(Pick.Number ~ Weight + Broad + Forty + Shuttle, data = lb.full)
+summary(lblm3)
+lb_bay <- as.data.frame(cbind(lb.full$Pick.Number, lb.full$Weight, lb.full$Broad, lb.full$Forty,
+                              lb.full$Shuttle))
+names(lb_bay) <- c("Pick.Number", "Weight", "Broad", "Forty", "Shuttle")
+
+# Bayesian Inference
+fit = lm(Pick.Number ~ Weight + Broad + Forty + Shuttle, data = lb_bay)
+summary(fit)
+
+y = lb_bay$Pick.Number
+n = length(y)
+x = as.matrix(cbind(rep(1,n), lb_bay[,2:5]))
+
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC 
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "Weight", xlab = expression(beta[1]))
+hist(beta[,3], main = "Broad", xlab = expression(beta[2]))
+hist(beta[,4], main = "Forty", xlab = expression(beta[3]))
+hist(beta[,5], main = "Shuttle", xlab = expression(beta[4]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Weight = future[,1],
+                 Broad = future[,2],
+                 Forty = future[,3],
+                 Shuttle = future[,3])
+
+# Predicting
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,16),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+prediction <- as.data.frame(cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975)))))
+colnames(prediction) <- c("PickNumber", "Lower", "Upper")
+
+# Plotting 
+matplot(rbind(1:16,1:16), apply(ytilde, 2, quantile, c(0.025, 0.975)),
+        type = "l", lty = 1, xlab = "", ylab = "Pick Number")
+title(main = "Predictive LB Pick Number for 2020 Combine Participants")
+points(1:16, prediction$PickNumber, pch = 19)
+
+# Defensive Backs Bayesian Inference
+
+# Data Formatting
+db <- read.csv("DBs.csv")
+db.full <- db[is.na(db$Forty) == FALSE, ]
+db.full <- db.full[is.na(db.full$Broad) == FALSE, ]
+db.full <- db.full[is.na(db.full$ThreeCone) == FALSE, ]
+
+prosp_db <- subset(prosp, Position == "DB")
+prosp_db_full <- prosp_db[is.na(prosp_db$Forty) == FALSE, ]
+prosp_db_full <- prosp_db_full[is.na(prosp_db_full$Broad) == FALSE, ]
+prosp_db_full <- prosp_db_full[is.na(prosp_db_full$ThreeCone) == FALSE, ]
+future <- as.data.frame(cbind(prosp_db_full$Forty, prosp_db_full$Broad, prosp_db_full$ThreeCone))
+names(future) <- c("Forty", "Broad", "ThreeCone")
+
+# Initial Regression 
+dblm2 <- lm(Pick.Number ~  Forty +  Broad + ThreeCone, data = db.full)
+summary(dblm2)
+db_bay <- as.data.frame(cbind(db.full$Pick.Number, db.full$Forty, db.full$Broad, db.full$ThreeCone))
+names(db_bay) <- c("Pick.Number", "Forty", "Broad", "ThreeCone")
+
+# Bayesian Inference 
+fit = lm(Pick.Number ~ Forty + Broad + ThreeCone, data = db_bay)
+summary(fit)
+
+y = db_bay$Pick.Number
+n = length(y)
+x = as.matrix(cbind(rep(1,n), db_bay[,2:4]))
+
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC 
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "Forty", xlab = expression(beta[1]))
+hist(beta[,3], main = "Broad", xlab = expression(beta[2]))
+hist(beta[,4], main = "ThreeCone", xlab = expression(beta[3]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Forty = future[,1],
+                 Broad = future[,2],
+                 ThreeCone = future[,3])
+
+# Predictring
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,17),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+prediction <- as.data.frame(cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975)))))
+colnames(prediction) <- c("PickNumber", "Lower", "Upper")
+
+# Plotting 
+matplot(rbind(1:17,1:17), apply(ytilde, 2, quantile, c(0.025, 0.975)),
+        type = "l", lty = 1, xlab = "", ylab = "Pick Number")
+title(main = "Predictive DB Pick Number for 2020 Combine Participants")
+points(1:17, prediction$PickNumber, pch = 19)
+
+# Tight Ends Bayesian Inference
+
+# Data Formatting
+te <- read.csv("TEs.csv")
+te.full <- te[is.na(te$Forty) == FALSE, ]
+te.full <- te.full[is.na(te.full$Bench) == FALSE, ]
+
+prosp_te <- subset(prosp, Position == "TE")
+prosp_te_full <- prosp_te[is.na(prosp_te$Forty) == FALSE, ]
+prosp_te_full <- prosp_te_full[is.na(prosp_te_full$Bench) == FALSE, ]
+future <- as.data.frame(cbind(prosp_te_full$Forty, prosp_te_full$Bench))
+names(future) <- c("Forty", "Bench")
+
+# Initial Regression
+telm2 <- lm(AV16 ~ Forty + Bench, data = te.full)
+summary(telm2)
+te_bay <- as.data.frame(cbind(te.full$Pick.Number, te.full$Forty, te.full$Bench))
+names(te_bay) <- c("Pick.Number", "Forty", "Bench")
+
+# Bayesian Inference
+fit = lm(Pick.Number ~ Forty + Bench, data = te_bay)
+summary(fit)
+
+y = te_bay$Pick.Number
+n = length(y)
+x = as.matrix(cbind(rep(1,n), te_bay[,2:3]))
+
+Vb = solve(t(x) %*% x) 
+betahat = Vb %*% t(x) %*% y
+s2 = t(y - x %*% betahat) %*% (y - x %*% betahat)
+
+  ## MCMC 
+T = 10000
+k = ncol(x)
+sigma2 = rep(NA, T)
+beta = matrix(NA, T, k)
+
+  ## Sample from joint posterior
+for (t in 1:T){
+  sigma2[t] = rigamma(1, (n-k)/2, s2/2)
+  beta[t,] = rmnorm(1, betahat, sigma2[t] * Vb)
+  
+}
+par(mfrow=c(2,2))
+hist(beta[,2], main = "Forty", xlab = expression(beta[1]))
+hist(beta[,3], main = "Bench", xlab = expression(beta[2]))
+hist(sigma2, main = "Variance", xlab = expression(sigma^2))
+par(mfrow=c(1,1))
+
+cat("Posterior mean of beta:", apply(beta, 2, mean))
+cat("Quantiles for beta:") 
+    apply(beta, 2, quantile, c(0.025, 0.5, 0.975))
+cat("Quantiles for sigma^2:", quantile(sigma2, c(0.025, 0.5, 0.975)))
+
+x_f00 = data.frame(Forty = future[,1],
+                   Bench = future[,2])
+
+# Predicting
+predict(fit, x_f00, interval = "prediction")
+
+# Predicting with Bayes
+x_f = as.matrix(cbind(rep(1,8),x_f00))
+n_f = nrow(x_f)
+
+ytilde = matrix(NA, T, n_f)
+for (t in 1:T){
+  ytilde[t,] = rmnorm(1, x_f %*% beta[t,], sigma2[t]*diag(n_f))
+}
+
+## Distribution of posterior predictive samples
+c.labels = c("A", "B", "C", "D")
+par(mfrow=c(2,2))
+for (j in 1:4){
+  hist(ytilde[ , j], main = paste("Covariate Set", c.labels[j]),
+       xlab = "log time", prob = T, breaks = 20)
+}
+par(mfrow=c(1,1))
+
+## Posterior mean / 95% credible interval 
+prediction <- as.data.frame(cbind(apply(ytilde, 2, mean),
+      t(apply(ytilde, 2, quantile, c(0.025, 0.975)))))
+colnames(prediction) <- c("PickNumber", "Lower", "Upper")
+prediction
+
+# Plotting 
+matplot(rbind(1:8,1:8), apply(ytilde, 2, quantile, c(0.025, 0.975)),
+        type = "l", lty = 1, xlab = "", ylab = "Pick Number")
+title(main = "Predictive TE Pick Number for 2020 Combine Participants")
+points(1:8, prediction$PickNumber, pch = 19)
+
+#--------------------------------------
+set.seed(123)
+ystar = matrix(NA, T, n)
+for (t in 1:T){
+  ystar[t,] = rmnorm(1, x %*% beta[t,], sigma2[t]*diag(n))
+}
+
+# Look at position of y relative to histogram of simulated values of y*: 
+
+  # Plot 95% credible intervals
+y_store = cbind(y, apply(ystar, 2, mean), 
+                t(apply(ystar, 2, quantile, c(0.025, 0.975))))
+colnames(y_store)[2] = "y_star_mean"
+
+pred.ci = apply(ystar, 2, quantile, c(0.025, 0.975))
+par(mfrow=c(1,1))
+matplot(rbind(1:n,1:n), pred.ci, type = "l", lty = 1, xlab = "Observation Index", 
+        ylab = "Pick Number", col = "black")
+
+  # Plot actual extinction log-times (y). Identify outliers as values outside 95% 
+  # credible interval
+colors = c(rep("black", 90), "red", "black", "red", rep("black",10), "red", "red",
+           rep("black",12), "red", "red", rep("black", 16))
+points(1:n, te.full$Pick.Number, pch = 19, col = colors)
+out = (te.full$Pick.Number > pred.ci[2,])
+title(main = "TE Pick Number Model Fit")
+```
+
+
+Scraping draft picks
+```{r}
+predictions <- read.csv('DraftPredictions.csv')
+predictions <- predictions %>%
+  rename(Prediction = Predicted.Pick.Number,
+         Player = Name) %>%
+  select(Player, Prediction)
+url <- "https://www.pro-football-reference.com/years/2020/draft.htm"
+download.file(url, destfile = paste0("picks.html"))
+picks <- htmlParse("picks.html")    
+picks <- readHTMLTable(picks)
+picks <- picks[[1]]
+picks <- picks[,c(2,4)]
+
+results <- left_join(predictions, picks)
+results <- drop_na(results)
+results <- results %>%
+  arrange(Prediction)
+
+write.csv(results, 'DraftResults.csv', row.names = FALSE)
+
+results <- read.csv('DraftResults.csv')
+results <- results %>%
+  arrange(Pick)
+
+write.csv(results, 'DraftResults.csv', row.names = FALSE)
+```
